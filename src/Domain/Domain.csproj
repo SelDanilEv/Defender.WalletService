@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <RootNamespace>Defender.ServiceTemplate.Domain</RootNamespace>
+        <AssemblyName>Defender.ServiceTemplate.Domain</AssemblyName>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Defender.Common" Version="1.2.9" />
+      <PackageReference Include="MediatR" Version="12.2.0" />
+      <PackageReference Include="MongoDB.Bson" Version="2.23.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+       <!-- <ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" />  -->
+    </ItemGroup>
+
+</Project>
