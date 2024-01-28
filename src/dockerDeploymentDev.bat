@@ -1,9 +1,9 @@
-docker rm -f DevServiceTemplate
-docker build . -t dev-service-template && ^
-docker run -d --name DevServiceTemplate -p 0000:80 ^
+docker rm -f DevWalletService
+docker build . -t dev-wallet-service && ^
+docker run -d --name DevWalletService -p 49058:80 ^
 --env-file ./../../secrets/secrets.dev.list ^
 -e ASPNETCORE_ENVIRONMENT=DockerDev ^
--it dev-service-template
-echo finish dev-service-template
+-it dev-wallet-service
+echo finish dev-wallet-service
 docker image prune -f
 pause

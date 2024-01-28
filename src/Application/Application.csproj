@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <RootNamespace>Defender.ServiceTemplate.Application</RootNamespace>
-        <AssemblyName>Defender.ServiceTemplate.Application</AssemblyName>
+        <RootNamespace>Defender.WalletService.Application</RootNamespace>
+        <AssemblyName>Defender.WalletService.Application</AssemblyName>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>

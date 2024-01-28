@@ -1,9 +1,9 @@
-docker rm -f LocalServiceTemplate
-docker build . -t local-service-template && ^
-docker run -d --name LocalServiceTemplate -p 0000:80 ^
+docker rm -f LocalWalletService
+docker build . -t local-wallet-service && ^
+docker run -d --name LocalWalletService -p 47058:80 ^
 --env-file ./../../secrets/secrets.local.list ^
 -e ASPNETCORE_ENVIRONMENT=DockerLocal ^
--it local-service-template
-echo finish local-service-template
+-it local-wallet-service
+echo finish local-wallet-service
 docker image prune -f
 pause

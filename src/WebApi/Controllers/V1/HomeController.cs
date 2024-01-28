@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Defender.ServiceTemplate.Application.Modules.Home.Queries;
+using Defender.WalletService.Application.Modules.Home.Queries;
 using Defender.Common.Attributes;
 using Defender.Common.Models;
 using Defender.Common.Enums;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Defender.Common.Interfaces;
 
-namespace Defender.ServiceTemplate.WebUI.Controllers.V1;
+namespace Defender.WalletService.WebUI.Controllers.V1;
 
 public class HomeController : BaseApiController
 {

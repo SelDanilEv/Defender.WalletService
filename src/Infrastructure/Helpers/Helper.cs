@@ -1,4 +1,4 @@
-﻿namespace Defender.ServiceTemplate.Infrastructure.Helpers;
+﻿namespace Defender.WalletService.Infrastructure.Helpers;
 
 public class Helper
 {

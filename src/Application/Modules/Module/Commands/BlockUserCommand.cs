@@ -1,10 +1,10 @@
 ﻿using Defender.Common.Errors;
 using Defender.Common.Interfaces;
-using Defender.ServiceTemplate.Application.Common.Interfaces;
+using Defender.WalletService.Application.Common.Interfaces;
 using FluentValidation;
 using MediatR;
 
-namespace Defender.ServiceTemplate.Application.Modules.Module.Commands;
+namespace Defender.WalletService.Application.Modules.Module.Commands;
 
 public record ModuleCommand : IRequest<Unit>
 {

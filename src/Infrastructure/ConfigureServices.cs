@@ -1,17 +1,17 @@
 ﻿using System.Reflection;
 using Defender.Common.Clients.Identity;
-using Defender.ServiceTemplate.Application.Common.Interfaces;
-using Defender.ServiceTemplate.Application.Common.Interfaces.Repositories;
-using Defender.ServiceTemplate.Application.Common.Interfaces.Wrapper;
-using Defender.ServiceTemplate.Application.Configuration.Options;
-using Defender.ServiceTemplate.Infrastructure.Clients.Service;
-using Defender.ServiceTemplate.Infrastructure.Repositories.DomainModels;
-using Defender.ServiceTemplate.Infrastructure.Services;
+using Defender.WalletService.Application.Common.Interfaces;
+using Defender.WalletService.Application.Common.Interfaces.Repositories;
+using Defender.WalletService.Application.Common.Interfaces.Wrapper;
+using Defender.WalletService.Application.Configuration.Options;
+using Defender.WalletService.Infrastructure.Clients.Service;
+using Defender.WalletService.Infrastructure.Repositories.DomainModels;
+using Defender.WalletService.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Defender.ServiceTemplate.Infrastructure;
+namespace Defender.WalletService.Infrastructure;
 
 public static class ConfigureServices
 {
@@ -52,7 +52,7 @@ public static class ConfigureServices
     }
 
     private static IServiceCollection RegisterApiClients(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IConfiguration configuration)
     {
         services.RegisterIdentityClient(

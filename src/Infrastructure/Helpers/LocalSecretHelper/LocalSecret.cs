@@ -1,4 +1,4 @@
-﻿namespace Defender.ServiceTemplate.Infrastructure.Helpers.LocalSecretHelper;
+﻿namespace Defender.WalletService.Infrastructure.Helpers.LocalSecretHelper;
 
 public enum LocalSecret
 {

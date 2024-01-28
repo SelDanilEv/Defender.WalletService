@@ -1,7 +1,7 @@
-﻿using Defender.ServiceTemplate.Application.Common.Interfaces;
-using Defender.ServiceTemplate.Application.Common.Interfaces.Repositories;
+﻿using Defender.WalletService.Application.Common.Interfaces;
+using Defender.WalletService.Application.Common.Interfaces.Repositories;
 
-namespace Defender.ServiceTemplate.Infrastructure.Services;
+namespace Defender.WalletService.Infrastructure.Services;
 
 public class Service : IService
 {

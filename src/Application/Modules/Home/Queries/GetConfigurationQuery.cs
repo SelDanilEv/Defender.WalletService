@@ -3,7 +3,7 @@ using Defender.Common.Enums;
 using Defender.Common.Helpers;
 using MediatR;
 
-namespace Defender.ServiceTemplate.Application.Modules.Home.Queries;
+namespace Defender.WalletService.Application.Modules.Home.Queries;
 
 public record GetConfigurationQuery : IRequest<Dictionary<string, string>>
 {

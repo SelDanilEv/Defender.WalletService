@@ -3,7 +3,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Defender.ServiceTemplate.WebUI.Controllers;
+namespace Defender.WalletService.WebUI.Controllers;
 
 [Route("api/[controller]")]
 public class BaseApiController : ControllerBase

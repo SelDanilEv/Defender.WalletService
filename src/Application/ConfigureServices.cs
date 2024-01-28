@@ -4,7 +4,7 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Defender.ServiceTemplate.Application;
+namespace Defender.WalletService.Application;
 
 public static class ConfigureServices
 {
