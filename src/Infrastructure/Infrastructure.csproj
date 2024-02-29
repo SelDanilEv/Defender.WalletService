@@ -78,6 +78,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Clients\Service\" />
       <Folder Include="Enums\" />
     </ItemGroup>
 

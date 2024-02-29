@@ -1,15 +1,11 @@
 ﻿using System.Reflection;
-using Defender.Common.Clients.Identity;
 using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
-using Defender.WalletService.Application.Common.Interfaces.Wrapper;
-using Defender.WalletService.Application.Configuration.Options;
-using Defender.WalletService.Infrastructure.Clients.Service;
 using Defender.WalletService.Infrastructure.Repositories.DomainModels;
 using Defender.WalletService.Infrastructure.Services;
+using Defender.WalletService.Infrastructure.Services.Background;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Defender.WalletService.Infrastructure;
 
@@ -32,21 +28,26 @@ public static class ConfigureServices
 
     private static IServiceCollection RegisterClientWrappers(this IServiceCollection services)
     {
-        services.AddTransient<IServiceWrapper, ServiceWrapper>();
+        //services.AddTransient<IServiceWrapper, ServiceWrapper>();
 
         return services;
     }
 
     private static IServiceCollection RegisterServices(this IServiceCollection services)
     {
-        services.AddTransient<IService, Service>();
+        services.AddTransient<IWalletManagementService, WalletManagementService>();
+        services.AddTransient<ITransactionManagementService, TransactionManagementService>();
+        services.AddTransient<ITransactionProcessingService, TransactionProcessingService>();
+
+        services.AddHostedService<TransactionConsumerService>();
 
         return services;
     }
 
     private static IServiceCollection RegisterRepositories(this IServiceCollection services)
     {
-        services.AddSingleton<IDomainModelRepository, DomainModelRepository>();
+        services.AddSingleton<ITransactionRepository, TransactionRepository>();
+        services.AddSingleton<IWalletRepository, WalletRepository>();
 
         return services;
     }
@@ -55,11 +56,11 @@ public static class ConfigureServices
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.RegisterIdentityClient(
-            (serviceProvider, client) =>
-            {
-                client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<ServiceOptions>>().Value.Url);
-            });
+        //services.RegisterIdentityClient(
+        //    (serviceProvider, client) =>
+        //    {
+        //        client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<ServiceOptions>>().Value.Url);
+        //    });
 
         return services;
     }
