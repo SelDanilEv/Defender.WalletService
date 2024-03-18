@@ -35,16 +35,19 @@ public class HomeController : BaseApiController
         return new { Status = "Healthy" };
     }
 
+    public record AuthCheckResponse(System.Guid UserId, string HighestRole);
+
     [HttpGet("authorization/check")]
     [Auth(Roles.User)]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AuthCheckResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<string> AuthorizationCheckAsync()
+    public async Task<AuthCheckResponse> AuthorizationCheckAsync()
     {
+        var userId = _accountAccessor.GetAccountId();
         var userRoles = _accountAccessor.GetRoles();
 
-        return RolesHelper.GetHighestRole(userRoles);
+        return new AuthCheckResponse(userId, RolesHelper.GetHighestRole(userRoles));
     }
 
     [Auth(Roles.SuperAdmin)]

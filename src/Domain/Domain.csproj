@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Defender.Common" Version="1.2.13" />
+      <PackageReference Include="Defender.Common" Version="1.2.15" />
       <PackageReference Include="Defender.Mongo.MessageBroker" Version="8.0.4" />
       <PackageReference Include="MediatR" Version="12.2.0" />
       <PackageReference Include="MongoDB.Bson" Version="2.23.1" />
