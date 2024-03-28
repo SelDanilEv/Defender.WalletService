@@ -22,6 +22,7 @@ public class Transaction : BaseTopicMessage, IBaseModel
     public DateTime UtcTransactionDate { get; set; }
     [BsonRepresentation(BsonType.String)]
     public Currency Currency { get; set; }
+    public string? Comment { get; set; }
 
 
     #region Creators 

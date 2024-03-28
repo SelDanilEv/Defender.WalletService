@@ -6,6 +6,7 @@ using Defender.Mongo.MessageBroker.Helpers;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Domain.Entities.Transactions;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace Defender.WalletService.Infrastructure.Repositories.DomainModels;
 
@@ -54,7 +55,11 @@ public class TransactionRepository : BaseMongoRepository<Transaction>, ITransact
 
     public async Task<Transaction> GetLastProccedTransaction()
     {
-        return await _mongoCollection.GetLastProccedEvent();
+        var filter = Builders<Transaction>
+            .Filter.Ne(t => t.TransactionStatus, 
+                Domain.Enums.TransactionStatus.Queued);
+
+        return await _mongoCollection.GetLastProccedEvent(filter);
     }
 
 }

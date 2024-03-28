@@ -52,19 +52,36 @@ public class TransactionManagementService : ITransactionManagementService
 
     public async Task<Transaction> UpdateTransactionStatusAsync(
         Transaction transaction,
-        TransactionStatus newStatus)
+        TransactionStatus newStatus,
+        string? comment = null)
     {
-        if (newStatus <= transaction.TransactionStatus)
+        if (newStatus < transaction.TransactionStatus)
         {
             throw new ServiceException(ErrorCode.BR_WLT_InvalidTransactionStatus);
+        }
+        if (newStatus == transaction.TransactionStatus && String.IsNullOrWhiteSpace(comment))
+        {
+            return transaction;
         }
 
         var request = UpdateModelRequest<Transaction>
             .Init(transaction)
-            .SetIfNotNull(x => x.TransactionStatus, newStatus);
+            .SetIfNotNull(x => x.TransactionStatus, newStatus)
+            .SetIfNotNull(x => x.Comment, comment);
 
         return await _transactionRepository
             .UpdateTransactionAsync(request);
+    }
+
+    public async Task<Transaction> UpdateTransactionStatusAsync(
+        Transaction transaction,
+        TransactionStatus newStatus,
+        ErrorCode error)
+    {
+        return await UpdateTransactionStatusAsync(
+            transaction,
+            newStatus,
+            error.ToString());
     }
 
     public async Task<Transaction> CreatePaymentTransactionAsync(

@@ -4,4 +4,5 @@ namespace Defender.WalletService.Application.DTOs;
 
 public class WalletDto : BaseWallet
 {
+    public Guid OwnerId { get; set; }
 }

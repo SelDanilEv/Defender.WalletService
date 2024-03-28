@@ -1,17 +1,14 @@
-﻿using Defender.Common.Interfaces;
+﻿using Defender.Common.Errors;
 using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Domain.Entities.Transactions;
-using Defender.WalletService.Domain.Enums;
 using FluentValidation;
 using MediatR;
 
-namespace Defender.WalletService.Application.Modules.Module.Commands;
+namespace Defender.WalletService.Application.Modules.Transactions.Commands;
 
-public record StartRechargeTransactionCommand : IRequest<Transaction>
+public record StartRechargeTransactionCommand : BaseTransactionCommand, IRequest<Transaction>
 {
     public int TargetWalletNumber { get; set; }
-    public int Amount { get; set; }
-    public Currency Currency { get; set; }
 };
 
 public sealed class StartRechargeTransactionCommandValidator :
@@ -19,6 +16,18 @@ public sealed class StartRechargeTransactionCommandValidator :
 {
     public StartRechargeTransactionCommandValidator()
     {
+        RuleFor(x => x.TargetWalletNumber)
+            .NotEmpty()
+            .WithMessage(ErrorCodeHelper.GetErrorCode(
+                ErrorCode.VL_WLT_EmptyWalletNumber))
+            .InclusiveBetween(10000000, 99999999)
+            .WithMessage(ErrorCodeHelper.GetErrorCode(
+                ErrorCode.VL_WLT_InvalidWalletNumber));
+
+        RuleFor(x => x.Amount)
+            .GreaterThan(0)
+            .WithMessage(ErrorCodeHelper.GetErrorCode(
+                ErrorCode.VL_WLT_TransferAmountMustBePositive));
     }
 }
 

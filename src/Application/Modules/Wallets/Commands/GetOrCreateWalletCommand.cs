@@ -4,7 +4,7 @@ using Defender.WalletService.Domain.Entities.Wallets;
 using FluentValidation;
 using MediatR;
 
-namespace Defender.WalletService.Application.Modules.Module.Commands;
+namespace Defender.WalletService.Application.Modules.Wallets.Commands;
 
 public record GetOrCreateWalletCommand : IRequest<Wallet>
 {
@@ -18,20 +18,11 @@ public sealed class GetOrCreateWalletCommandValidator : AbstractValidator<GetOrC
     }
 }
 
-public sealed class GetOrCreateWalletCommandHandler : IRequestHandler<GetOrCreateWalletCommand, Wallet>
+public sealed class GetOrCreateWalletCommandHandler(
+        ICurrentAccountAccessor _currentAccountAccessor,
+        IWalletManagementService _walletManagementService)
+    : IRequestHandler<GetOrCreateWalletCommand, Wallet>
 {
-    private readonly ICurrentAccountAccessor _currentAccountAccessor;
-    private readonly IWalletManagementService _walletManagementService;
-
-    public GetOrCreateWalletCommandHandler(
-        ICurrentAccountAccessor currentAccountAccessor,
-        IWalletManagementService walletManagementService
-        )
-    {
-        _currentAccountAccessor = currentAccountAccessor;
-        _walletManagementService = walletManagementService;
-    }
-
     public async Task<Wallet> Handle(
         GetOrCreateWalletCommand request,
         CancellationToken cancellationToken)

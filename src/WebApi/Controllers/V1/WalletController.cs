@@ -5,17 +5,14 @@ using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Defender.Common.Attributes;
 using Defender.Common.Models;
-using Defender.WalletService.Application.Modules.Module.Commands;
 using Defender.WalletService.Application.DTOs;
+using Defender.WalletService.Application.Modules.Wallets.Commands;
+using Defender.WalletService.Application.Modules.Wallets.Queries;
 
 namespace Defender.WalletService.WebUI.Controllers.V1;
 
-public class WalletController : BaseApiController
+public class WalletController(IMediator mediator, IMapper mapper) : BaseApiController(mediator, mapper)
 {
-    public WalletController(IMediator mediator, IMapper mapper) : base(mediator, mapper)
-    {
-    }
-
     [HttpGet("get-or-create")]
     [Auth(Roles.User)]
     [ProducesResponseType(typeof(WalletDto), StatusCodes.Status200OK)]
@@ -24,6 +21,16 @@ public class WalletController : BaseApiController
         [FromQuery] GetOrCreateWalletCommand command)
     {
         return await ProcessApiCallAsync<GetOrCreateWalletCommand, WalletDto>(command);
+    }
+
+    [HttpGet("info-by-number")]
+    [Auth(Roles.User)]
+    [ProducesResponseType(typeof(PublicWalletInfoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<PublicWalletInfoDto> GetWalletInfoByNumberAsync(
+        [FromQuery] GetWalletInfoByNumberQuery command)
+    {
+        return await ProcessApiCallAsync<GetWalletInfoByNumberQuery, PublicWalletInfoDto>(command);
     }
 
     [HttpPost("account/create")]

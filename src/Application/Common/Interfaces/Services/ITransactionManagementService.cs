@@ -1,4 +1,5 @@
 ﻿using Defender.Common.DB.Pagination;
+using Defender.Common.Errors;
 using Defender.WalletService.Domain.Entities.Transactions;
 using Defender.WalletService.Domain.Enums;
 
@@ -15,7 +16,13 @@ public interface ITransactionManagementService
 
     Task<Transaction> UpdateTransactionStatusAsync(
         Transaction transaction,
-        TransactionStatus newStatus);
+        TransactionStatus newStatus,
+        string? comment = null);
+
+    Task<Transaction> UpdateTransactionStatusAsync(
+        Transaction transaction,
+        TransactionStatus newStatus,
+        ErrorCode error);
 
     Task<Transaction> CreateRechargeTransactionAsync(
         int wallet, 

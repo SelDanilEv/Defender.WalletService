@@ -8,13 +8,13 @@ using Defender.Common.Models;
 using Defender.WalletService.Application.DTOs;
 using Defender.NotificationService.Application.Modules.Monitoring.Queries;
 using Defender.Common.DB.Pagination;
-using Defender.WalletService.Application.Modules.Module.Commands;
+using Defender.WalletService.Application.Modules.Transactions.Commands;
 
 namespace Defender.WalletService.WebUI.Controllers.V1;
 
-public class TransactionController : BaseApiController
+public class TransactionsController : BaseApiController
 {
-    public TransactionController(IMediator mediator, IMapper mapper) : base(mediator, mapper)
+    public TransactionsController(IMediator mediator, IMapper mapper) : base(mediator, mapper)
     {
     }
 

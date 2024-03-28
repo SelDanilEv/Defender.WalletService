@@ -5,14 +5,14 @@ using Defender.WalletService.Domain.Enums;
 using FluentValidation;
 using MediatR;
 
-namespace Defender.WalletService.Application.Modules.Module.Commands;
+namespace Defender.WalletService.Application.Modules.Wallets.Commands;
 
 public record SetDefaultCurrencyAccountCommand : IRequest<Wallet>
 {
     public Currency Currency { get; set; }
 };
 
-public sealed class SetDefaultCurrencyAccountCommandValidator : 
+public sealed class SetDefaultCurrencyAccountCommandValidator :
     AbstractValidator<SetDefaultCurrencyAccountCommand>
 {
     public SetDefaultCurrencyAccountCommandValidator()
@@ -20,21 +20,11 @@ public sealed class SetDefaultCurrencyAccountCommandValidator :
     }
 }
 
-public sealed class SetDefaultCurrencyAccountCommandHandler : 
-    IRequestHandler<SetDefaultCurrencyAccountCommand, Wallet>
+public sealed class SetDefaultCurrencyAccountCommandHandler(
+        ICurrentAccountAccessor _currentAccountAccessor,
+        IWalletManagementService _walletManagementService)
+    : IRequestHandler<SetDefaultCurrencyAccountCommand, Wallet>
 {
-    private readonly ICurrentAccountAccessor _currentAccountAccessor;
-    private readonly IWalletManagementService _walletManagementService;
-
-    public SetDefaultCurrencyAccountCommandHandler(
-        ICurrentAccountAccessor currentAccountAccessor,
-        IWalletManagementService walletManagementService
-        )
-    {
-        _currentAccountAccessor = currentAccountAccessor;
-        _walletManagementService = walletManagementService;
-    }
-
     public async Task<Wallet> Handle(
         SetDefaultCurrencyAccountCommand request,
         CancellationToken cancellationToken)

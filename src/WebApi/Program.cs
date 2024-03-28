@@ -35,6 +35,9 @@ if (builder.Environment.IsLocalOrDevelopment())
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
     });
+
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
 }
 else
 {

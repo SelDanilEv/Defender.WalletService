@@ -5,7 +5,7 @@ using Defender.WalletService.Domain.Enums;
 using FluentValidation;
 using MediatR;
 
-namespace Defender.WalletService.Application.Modules.Module.Commands;
+namespace Defender.WalletService.Application.Modules.Wallets.Commands;
 
 public record AddCurrencyAccountCommand : IRequest<Wallet>
 {
@@ -21,20 +21,11 @@ public sealed class AddCurrencyAccountCommandValidator : AbstractValidator<AddCu
     }
 }
 
-public sealed class AddCurrencyAccountCommandHandler : IRequestHandler<AddCurrencyAccountCommand, Wallet>
+public sealed class AddCurrencyAccountCommandHandler(
+        ICurrentAccountAccessor _currentAccountAccessor,
+        IWalletManagementService _walletManagementService)
+    : IRequestHandler<AddCurrencyAccountCommand, Wallet>
 {
-    private readonly ICurrentAccountAccessor _currentAccountAccessor;
-    private readonly IWalletManagementService _walletManagementService;
-
-    public AddCurrencyAccountCommandHandler(
-        ICurrentAccountAccessor currentAccountAccessor,
-        IWalletManagementService walletManagementService
-        )
-    {
-        _currentAccountAccessor = currentAccountAccessor;
-        _walletManagementService = walletManagementService;
-    }
-
     public async Task<Wallet> Handle(
         AddCurrencyAccountCommand request,
         CancellationToken cancellationToken)
