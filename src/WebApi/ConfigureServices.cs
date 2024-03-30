@@ -46,7 +46,7 @@ public static class ConfigureServices
         services.AddControllers().AddJsonOptions(x =>
         {
             x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            x.JsonSerializerOptions.IgnoreNullValues = true;
+            x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         });
 
         services.Configure<ApiBehaviorOptions>(options =>

@@ -16,8 +16,9 @@ var logger = new LoggerConfiguration()
   .Enrich.FromLogContext()
   .CreateLogger();
 
-builder.Logging.ClearProviders();
-builder.Logging.AddSerilog(logger);
+builder.Logging.ClearProviders()
+    .AddSerilog(logger)
+    .AddConsole();
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddWebUIServices(builder.Environment, builder.Configuration);

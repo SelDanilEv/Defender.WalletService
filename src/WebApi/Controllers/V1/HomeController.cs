@@ -1,53 +1,47 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Defender.WalletService.Application.Modules.Home.Queries;
 using Defender.Common.Attributes;
 using Defender.Common.Models;
 using Defender.Common.Enums;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Defender.Common.Interfaces;
-using Defender.Common.Helpers;
+using Defender.Common.Modules.Home.Queries;
+using Defender.Common.DTOs;
 
 namespace Defender.WalletService.WebUI.Controllers.V1;
 
-public class HomeController : BaseApiController
-{
-
-    private readonly ICurrentAccountAccessor _accountAccessor;
-
-    public HomeController(
-        ICurrentAccountAccessor accountAccessor,
+public partial class HomeController(
         IMediator mediator,
-        IMapper mapper)
-        : base(mediator, mapper)
-    {
-        _accountAccessor = accountAccessor;
-    }
+        IMapper mapper) 
+    : BaseApiController(mediator, mapper)
+{
     [HttpGet("health")]
-    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(HealthCheckDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<object> HealthCheckAsync()
+    public async Task<HealthCheckDto> HealthCheckAsync()
     {
-        return new { Status = "Healthy" };
-    }
+        var query = new HealthCheckQuery();
 
-    public record AuthCheckResponse(System.Guid UserId, string HighestRole);
+        return await ProcessApiCallWithoutMappingAsync<
+            HealthCheckQuery,
+            HealthCheckDto>(query);
+    }
 
     [HttpGet("authorization/check")]
     [Auth(Roles.User)]
-    [ProducesResponseType(typeof(AuthCheckResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AuthCheckDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<AuthCheckResponse> AuthorizationCheckAsync()
+    public async Task<AuthCheckDto> AuthorizationCheckAsync()
     {
-        var userId = _accountAccessor.GetAccountId();
-        var userRoles = _accountAccessor.GetRoles();
+        var query = new AuthCheckQuery();
 
-        return new AuthCheckResponse(userId, RolesHelper.GetHighestRole(userRoles));
+        return await ProcessApiCallWithoutMappingAsync<
+            AuthCheckQuery,
+            AuthCheckDto>(query);
     }
 
     [Auth(Roles.SuperAdmin)]
@@ -62,6 +56,8 @@ public class HomeController : BaseApiController
             Level = configurationLevel
         };
 
-        return await ProcessApiCallWithoutMappingAsync<GetConfigurationQuery, Dictionary<string, string>>(query);
+        return await ProcessApiCallWithoutMappingAsync<
+            GetConfigurationQuery, 
+            Dictionary<string, string>>(query);
     }
 }

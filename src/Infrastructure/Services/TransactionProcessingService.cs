@@ -92,10 +92,13 @@ public class TransactionProcessingService : ITransactionProcessingService
             return;
         }
 
-        await ProccessCreditAsync(transaction, sessionHandle);
-        await ProccessDebitAsync(transaction, sessionHandle);
+        var isStepSuccess = 
+            await ProccessCreditAsync(transaction, sessionHandle);
+        if (isStepSuccess)
+            await ProccessDebitAsync(transaction, sessionHandle);
 
-        await _transactionManagementService
+        if (isStepSuccess)
+            await _transactionManagementService
             .UpdateTransactionStatusAsync(
                 transaction,
                 TransactionStatus.Procced);
@@ -113,7 +116,7 @@ public class TransactionProcessingService : ITransactionProcessingService
                 TransactionStatus.Procced);
     }
 
-    private async Task ProccessDebitAsync(
+    private async Task<bool> ProccessDebitAsync(
         Transaction transaction,
         IClientSessionHandle sessionHandle)
     {
@@ -125,7 +128,7 @@ public class TransactionProcessingService : ITransactionProcessingService
             await HandleError(
                 transaction,
                 ErrorCode.BR_WLT_WalletIsNotExist);
-            return;
+            return false;
         }
 
         if (!toWallet.IsCurrencyAccountExist(transaction.Currency))
@@ -133,7 +136,7 @@ public class TransactionProcessingService : ITransactionProcessingService
             await HandleError(
                 transaction,
                 ErrorCode.BR_WLT_RecipientCurrencyAccountIsNotExist);
-            return;
+            return false;
         };
 
         var currencyAccount = toWallet.GetCurrencyAccount(transaction.Currency);
@@ -144,21 +147,31 @@ public class TransactionProcessingService : ITransactionProcessingService
             toWallet.Id,
             toWallet.CurrencyAccounts,
             sessionHandle);
+
+        return true;
     }
 
-    private async Task ProccessCreditAsync(
+    private async Task<bool> ProccessCreditAsync(
         Transaction transaction,
         IClientSessionHandle sessionHandle)
     {
         var fromWallet = await _walletRepository
-            .GetWalletByNumberAsync(transaction.FromWallet);
+        .GetWalletByNumberAsync(transaction.FromWallet);
+
+        if (fromWallet == null)
+        {
+            await HandleError(
+                transaction,
+                ErrorCode.BR_WLT_WalletIsNotExist);
+            return false;
+        };
 
         if (!fromWallet.IsCurrencyAccountExist(transaction.Currency))
         {
             await HandleError(
                 transaction,
                 ErrorCode.BR_WLT_SenderCurrencyAccountIsNotExist);
-            return;
+            return false;
         };
 
         var currencyAccount = fromWallet
@@ -171,13 +184,15 @@ public class TransactionProcessingService : ITransactionProcessingService
             await HandleError(
                 transaction,
                 ErrorCode.BR_WLT_NotEnoughFunds);
-            return;
+            return false;
         }
 
         await _walletRepository.UpdateCurrencyAccountsAsync(
             fromWallet.Id,
             fromWallet.CurrencyAccounts,
             sessionHandle);
+
+        return true;
     }
 
     private static Func<Task> MapToFunc<T>(
@@ -201,4 +216,5 @@ public class TransactionProcessingService : ITransactionProcessingService
             TransactionStatus.Failed,
             error);
     }
+
 }
