@@ -9,16 +9,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Defender.Common" Version="1.2.19" />
+        <PackageReference Include="Defender.Common" Version="1.2.20" />
         <PackageReference Include="Defender.Mongo.MessageBroker" Version="8.0.5" />
         <PackageReference Include="MediatR" Version="12.2.0" />
         <PackageReference Include="MongoDB.Bson" Version="2.23.1" />
     </ItemGroup>
 
     <ItemGroup>
-        <!--<ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" /> 
-        <ProjectReference Include="..\..\..\Defender.Mongo.MessageBroker\src\Defender.Mongo.MessageBroker\Defender.Mongo.MessageBroker.csproj" />-->
+        <ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" />
+        <ProjectReference Include="..\..\..\Defender.Mongo.MessageBroker\src\Defender.Mongo.MessageBroker\Defender.Mongo.MessageBroker.csproj" />
     </ItemGroup>
-
 
 </Project>

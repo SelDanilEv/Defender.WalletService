@@ -1,3 +1,4 @@
+using Defender.Common.DB.Pagination;
 using Defender.Common.Mapping;
 using Defender.WalletService.Application.DTOs;
 using Defender.WalletService.Domain.Entities.Transactions;

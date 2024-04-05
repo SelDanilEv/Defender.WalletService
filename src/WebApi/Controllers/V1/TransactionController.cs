@@ -12,13 +12,13 @@ using Defender.WalletService.Application.Modules.Transactions.Commands;
 
 namespace Defender.WalletService.WebUI.Controllers.V1;
 
-public class TransactionsController : BaseApiController
+public class TransactionController : BaseApiController
 {
-    public TransactionsController(IMediator mediator, IMapper mapper) : base(mediator, mapper)
+    public TransactionController(IMediator mediator, IMapper mapper) : base(mediator, mapper)
     {
     }
 
-    [HttpGet("get/status")]
+    [HttpGet("status")]
     [Auth(Roles.User)]
     [ProducesResponseType(typeof(AnonymousTransactionDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
@@ -28,14 +28,14 @@ public class TransactionsController : BaseApiController
         return await ProcessApiCallAsync<GetUserTransactionByTransactionIdQuery, AnonymousTransactionDto>(query);
     }
 
-    [HttpGet("get")]
+    [HttpGet("history")]
     [Auth(Roles.User)]
-    [ProducesResponseType(typeof(TransactionDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedResult<TransactionDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public async Task<PagedResult<TransactionDto>> GetUserTransactionsAsync(
-        [FromQuery] GetTransactionsQuery query)
+        [FromQuery] GetTransactionHistoryQuery query)
     {
-        return await ProcessApiCallAsync<GetTransactionsQuery, PagedResult<TransactionDto>>(query);
+        return await ProcessApiCallAsync<GetTransactionHistoryQuery, PagedResult<TransactionDto>>(query);
     }
 
     [HttpPost("payment")]

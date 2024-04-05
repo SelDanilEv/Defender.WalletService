@@ -22,6 +22,7 @@ public class Transaction : BaseTopicMessage, IBaseModel
     public DateTime UtcTransactionDate { get; set; }
     [BsonRepresentation(BsonType.String)]
     public Currency Currency { get; set; }
+    public string? FailureCode { get; set; }
     public string? Comment { get; set; }
 
 
@@ -108,29 +109,13 @@ public class Transaction : BaseTopicMessage, IBaseModel
         return string.Format(
             "{0}-{1}-{2}", 
             prefixMap[type],
-            $"{transactionDate:yyyyMMddHHmmss}", 
-            new Random().Next(10000, 99999));
+            $"{transactionDate:yyyyMMddHHmm}", 
+            new Random().Next(1000, 9999));
     }
 
 
     #endregion
 
-
-    #region Methods
-
-
-    public Transaction MapToUserTransaction(int userWalletNumber)
-    {
-        if(userWalletNumber == this.FromWallet)
-        {
-            this.Amount *= -1;
-        }
-
-        return this;
-    }
-
-
-    #endregion
 }
 
 

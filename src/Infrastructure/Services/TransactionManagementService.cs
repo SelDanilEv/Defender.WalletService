@@ -35,11 +35,6 @@ public class TransactionManagementService : ITransactionManagementService
         var transactions = await _transactionRepository
             .GetTransactionsAsync(paginationRequest, walletNumber);
 
-        transactions.Items = transactions
-            .Items
-            .Select(t => t.MapToUserTransaction(walletNumber))
-            .ToList();
-
         return transactions;
     }
 
@@ -53,13 +48,13 @@ public class TransactionManagementService : ITransactionManagementService
     public async Task<Transaction> UpdateTransactionStatusAsync(
         Transaction transaction,
         TransactionStatus newStatus,
-        string? comment = null)
+        string? failureCode = null)
     {
         if (newStatus < transaction.TransactionStatus)
         {
             throw new ServiceException(ErrorCode.BR_WLT_InvalidTransactionStatus);
         }
-        if (newStatus == transaction.TransactionStatus && String.IsNullOrWhiteSpace(comment))
+        if (newStatus == transaction.TransactionStatus && String.IsNullOrWhiteSpace(failureCode))
         {
             return transaction;
         }
@@ -67,7 +62,7 @@ public class TransactionManagementService : ITransactionManagementService
         var request = UpdateModelRequest<Transaction>
             .Init(transaction)
             .SetIfNotNull(x => x.TransactionStatus, newStatus)
-            .SetIfNotNull(x => x.Comment, comment);
+            .SetIfNotNull(x => x.FailureCode, failureCode);
 
         return await _transactionRepository
             .UpdateTransactionAsync(request);

@@ -14,4 +14,7 @@ public class TransactionDto
 
     public int FromWallet { get; set; }
     public int ToWallet { get; set; }
+
+    public string? FailureCode { get; set; }
+    public string? Comment { get; set; }
 }
