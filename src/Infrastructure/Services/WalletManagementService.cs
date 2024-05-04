@@ -1,5 +1,6 @@
 ﻿using Defender.Common.Errors;
 using Defender.Common.Exceptions;
+using Defender.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Domain.Entities.Wallets;
@@ -7,30 +8,26 @@ using Defender.WalletService.Domain.Enums;
 
 namespace Defender.WalletService.Infrastructure.Services;
 
-public class WalletManagementService : IWalletManagementService
+public class WalletManagementService(
+        IWalletRepository walletRepository,
+        ICurrentAccountAccessor currentAccountAccessor) 
+    : IWalletManagementService
 {
-    private readonly IWalletRepository _walletRepository;
-
-    public WalletManagementService(
-        IWalletRepository walletRepository)
-    {
-        _walletRepository = walletRepository;
-    }
-
     public async Task<Wallet> GetWalletByUserIdAsync(Guid userId)
     {
-        return await _walletRepository.GetWalletByUserIdAsync(userId);
+        return await walletRepository.GetWalletByUserIdAsync(userId);
     }
 
     public async Task<Wallet> GetWalletByNumberAsync(int walletNumber)
     {
-        return await _walletRepository.GetWalletByNumberAsync(walletNumber);
+        return await walletRepository.GetWalletByNumberAsync(walletNumber);
     }
 
-    public async Task<Wallet> CreateNewWalletAsync()
+    public async Task<Wallet> CreateNewWalletAsync(Guid? userId = null)
     {
         var wallet = new Wallet
         {
+            Id = userId ?? currentAccountAccessor.GetAccountId(),
             CurrencyAccounts = new HashSet<CurrencyAccount>
             {
                 new CurrencyAccount
@@ -42,7 +39,7 @@ public class WalletManagementService : IWalletManagementService
             }
         };
 
-        return await _walletRepository.CreateNewWalletAsync(wallet);
+        return await walletRepository.CreateNewWalletAsync(wallet);
     }
 
     public async Task<Wallet> AddCurrencyAccountAsync(
@@ -50,7 +47,7 @@ public class WalletManagementService : IWalletManagementService
         Currency currency,
         bool isDefault = false)
     {
-        var wallet = await _walletRepository.GetWalletByUserIdAsync(userId);
+        var wallet = await walletRepository.GetWalletByUserIdAsync(userId);
 
         if (wallet.CurrencyAccounts
             .FirstOrDefault(x => x.Currency == currency) != null)
@@ -68,7 +65,7 @@ public class WalletManagementService : IWalletManagementService
 
         wallet.CurrencyAccounts.Add(new CurrencyAccount(currency, isDefault));
 
-        return await _walletRepository.UpdateCurrencyAccountsAsync(
+        return await walletRepository.UpdateCurrencyAccountsAsync(
             wallet.Id,
             wallet.CurrencyAccounts);
     }
@@ -77,7 +74,7 @@ public class WalletManagementService : IWalletManagementService
         Guid userId,
         Currency currency)
     {
-        var wallet = await _walletRepository.GetWalletByUserIdAsync(userId);
+        var wallet = await walletRepository.GetWalletByUserIdAsync(userId);
 
         var newDefaultAccount = wallet.CurrencyAccounts
             .FirstOrDefault(x => x.Currency == currency);
@@ -94,7 +91,7 @@ public class WalletManagementService : IWalletManagementService
         if (oldDefaultAccount != null)
             oldDefaultAccount.IsDefault = false;
 
-        return await _walletRepository.UpdateCurrencyAccountsAsync(
+        return await walletRepository.UpdateCurrencyAccountsAsync(
             wallet.Id,
             wallet.CurrencyAccounts);
     }

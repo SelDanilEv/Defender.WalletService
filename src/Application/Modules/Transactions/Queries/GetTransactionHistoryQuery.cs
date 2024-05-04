@@ -30,11 +30,11 @@ public sealed class GetTransactionsQueryHandler(
     : IRequestHandler<GetTransactionHistoryQuery, PagedResult<Transaction>>
 {
     public async Task<PagedResult<Transaction>> Handle(
-        GetTransactionHistoryQuery request, 
+        GetTransactionHistoryQuery request,
         CancellationToken cancellationToken)
     {
         return request.WalletId.HasValue ?
-            await authorizationCheckingService.RunWithAuthAsync(
+            await authorizationCheckingService.ExecuteWithAuthCheckAsync(
                 request.WalletId.Value,
                 async () => await GetTransactions(request, request.WalletId.Value)
             ) :

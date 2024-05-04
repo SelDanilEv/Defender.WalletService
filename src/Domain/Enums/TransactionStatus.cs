@@ -4,5 +4,5 @@ public enum TransactionStatus
 {
     Queued,
     Failed,
-    Procced,
+    Proceed,
 }

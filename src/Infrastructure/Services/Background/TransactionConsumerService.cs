@@ -29,10 +29,12 @@ public class TransactionConsumerService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await _consumer.SubscribeAsync<Transaction>(
-            async (transaction) => await _transactionProcessingService.ProcessTransaction(transaction),
+            async (transaction) =>
+                await _transactionProcessingService.ProcessTransaction(transaction),
             async () =>
             {
-                var lastRecord = await _transactionRepository.GetLastProccedTransaction();
+                var lastRecord = await _transactionRepository
+                    .GetLastProceedTransaction();
 
                 if (lastRecord == null)
                 {

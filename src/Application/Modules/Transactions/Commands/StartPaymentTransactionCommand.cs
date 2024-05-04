@@ -71,7 +71,7 @@ public sealed class StartPaymentTransactionCommandHandler :
                 .GetWalletByNumberAsync(request.TargetWalletNumber.Value);
 
             transaction = await _authorizationCheckingService
-                .RunWithAuthAsync(
+                .ExecuteWithAuthCheckAsync(
                     targetWallet.Id,
                     async () => await _transactionManagementService
                         .CreatePaymentTransactionAsync(

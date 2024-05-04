@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
+using Defender.WalletService.Infrastructure.Repositories;
 using Defender.WalletService.Infrastructure.Repositories.DomainModels;
 using Defender.WalletService.Infrastructure.Services;
 using Defender.WalletService.Infrastructure.Services.Background;

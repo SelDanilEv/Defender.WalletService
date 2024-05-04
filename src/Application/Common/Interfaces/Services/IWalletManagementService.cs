@@ -7,7 +7,7 @@ public interface IWalletManagementService
 {
     Task<Wallet> GetWalletByUserIdAsync(Guid userId);
     Task<Wallet> GetWalletByNumberAsync(int walletNumber);
-    Task<Wallet> CreateNewWalletAsync();
+    Task<Wallet> CreateNewWalletAsync(Guid? userId = null);
     Task<Wallet> AddCurrencyAccountAsync(
         Guid userId,
         Currency currency,

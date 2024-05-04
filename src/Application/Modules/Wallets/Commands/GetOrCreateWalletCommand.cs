@@ -8,7 +8,7 @@ namespace Defender.WalletService.Application.Modules.Wallets.Commands;
 
 public record GetOrCreateWalletCommand : IRequest<Wallet>
 {
-    //public Guid? UserId { get; set; }
+    public Guid? UserId { get; set; }
 };
 
 public sealed class GetOrCreateWalletCommandValidator : AbstractValidator<GetOrCreateWalletCommand>
@@ -19,21 +19,31 @@ public sealed class GetOrCreateWalletCommandValidator : AbstractValidator<GetOrC
 }
 
 public sealed class GetOrCreateWalletCommandHandler(
-        ICurrentAccountAccessor _currentAccountAccessor,
-        IWalletManagementService _walletManagementService)
+        IAuthorizationCheckingService authorizationCheckingService,
+        ICurrentAccountAccessor currentAccountAccessor,
+        IWalletManagementService walletManagementService)
     : IRequestHandler<GetOrCreateWalletCommand, Wallet>
 {
     public async Task<Wallet> Handle(
         GetOrCreateWalletCommand request,
         CancellationToken cancellationToken)
     {
-        var userId = _currentAccountAccessor.GetAccountId();
+        var targetUserId = request.UserId ?? currentAccountAccessor.GetAccountId();
 
-        var wallet = await _walletManagementService.GetWalletByUserIdAsync(userId);
+        var wallet = await authorizationCheckingService.ExecuteWithAuthCheckAsync(targetUserId,
+            async () => await GetOrCreateWalletAsync(targetUserId));
+
+        return wallet;
+    }
+
+
+    private async Task<Wallet> GetOrCreateWalletAsync(Guid userId)
+    {
+        var wallet = await walletManagementService.GetWalletByUserIdAsync(userId);
 
         if (wallet == null)
         {
-            wallet = await _walletManagementService.CreateNewWalletAsync();
+            wallet = await walletManagementService.CreateNewWalletAsync(userId);
         }
 
         return wallet;

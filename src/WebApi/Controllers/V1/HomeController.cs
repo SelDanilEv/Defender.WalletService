@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Defender.Common.Attributes;
-using Defender.Common.Models;
+using Defender.Common.Consts;
 using Defender.Common.Enums;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
@@ -14,7 +14,7 @@ namespace Defender.WalletService.WebUI.Controllers.V1;
 
 public partial class HomeController(
         IMediator mediator,
-        IMapper mapper) 
+        IMapper mapper)
     : BaseApiController(mediator, mapper)
 {
     [HttpGet("health")]
@@ -57,7 +57,7 @@ public partial class HomeController(
         };
 
         return await ProcessApiCallWithoutMappingAsync<
-            GetConfigurationQuery, 
+            GetConfigurationQuery,
             Dictionary<string, string>>(query);
     }
 }

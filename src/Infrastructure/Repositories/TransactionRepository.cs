@@ -8,7 +8,7 @@ using Defender.WalletService.Domain.Entities.Transactions;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-namespace Defender.WalletService.Infrastructure.Repositories.DomainModels;
+namespace Defender.WalletService.Infrastructure.Repositories;
 
 public class TransactionRepository : BaseMongoRepository<Transaction>, ITransactionRepository
 {
@@ -53,13 +53,13 @@ public class TransactionRepository : BaseMongoRepository<Transaction>, ITransact
         return await AddItemAsync(transaction);
     }
 
-    public async Task<Transaction> GetLastProccedTransaction()
+    public async Task<Transaction> GetLastProceedTransaction()
     {
         var filter = Builders<Transaction>
-            .Filter.Ne(t => t.TransactionStatus, 
+            .Filter.Ne(t => t.TransactionStatus,
                 Domain.Enums.TransactionStatus.Queued);
 
-        return await _mongoCollection.GetLastProccedEvent(filter);
+        return await _mongoCollection.GetLastProceedEvent(filter);
     }
 
 }

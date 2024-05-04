@@ -3,7 +3,6 @@ using Defender.Common.DB.Model;
 using Defender.Common.DB.Repositories;
 using Defender.Common.Errors;
 using Defender.Common.Exceptions;
-using Defender.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Domain.Entities.Wallets;
 using Microsoft.Extensions.Options;
@@ -12,18 +11,10 @@ using MongoDB.Driver.Linq;
 
 namespace Defender.WalletService.Infrastructure.Repositories.DomainModels;
 
-public class WalletRepository : BaseMongoRepository<Wallet>, IWalletRepository
+public class WalletRepository(
+        IOptions<MongoDbOptions> mongoOption) 
+    : BaseMongoRepository<Wallet>(mongoOption.Value), IWalletRepository
 {
-    private readonly ICurrentAccountAccessor _currentAccountAccessor;
-
-    public WalletRepository(
-        IOptions<MongoDbOptions> mongoOption,
-        ICurrentAccountAccessor currentAccountAccessor) : 
-        base(mongoOption.Value)
-    {
-        _currentAccountAccessor = currentAccountAccessor;
-    }
-
     public async Task<Wallet> GetWalletByUserIdAsync(Guid userId)
     {
         return await GetItemAsync(userId);
@@ -38,7 +29,6 @@ public class WalletRepository : BaseMongoRepository<Wallet>, IWalletRepository
 
     public async Task<Wallet> CreateNewWalletAsync(Wallet wallet)
     {
-        wallet.Id = _currentAccountAccessor.GetAccountId();
         wallet.WalletNumber = await GenerateUniqueWalletNumber();
 
         return await AddItemAsync(wallet);

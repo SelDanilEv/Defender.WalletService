@@ -14,7 +14,7 @@ public class TransactionProcessingService : ITransactionProcessingService
     private readonly ITransactionManagementService _transactionManagementService;
     private readonly IWalletRepository _walletRepository;
 
-    private readonly TransactionTypeActionMapper transactionTypeMap = 
+    private readonly TransactionTypeActionMapper transactionTypeMap =
         new TransactionTypeActionMapper();
 
     public TransactionProcessingService(
@@ -77,7 +77,7 @@ public class TransactionProcessingService : ITransactionProcessingService
         await _transactionManagementService
             .UpdateTransactionStatusAsync(
                 transaction,
-                TransactionStatus.Procced);
+                TransactionStatus.Proceed);
     }
 
     private async Task ProcessTransfer(
@@ -92,7 +92,7 @@ public class TransactionProcessingService : ITransactionProcessingService
             return;
         }
 
-        var isStepSuccess = 
+        var isStepSuccess =
             await ProccessCreditAsync(transaction, sessionHandle);
         if (isStepSuccess)
             await ProccessDebitAsync(transaction, sessionHandle);
@@ -101,7 +101,7 @@ public class TransactionProcessingService : ITransactionProcessingService
             await _transactionManagementService
             .UpdateTransactionStatusAsync(
                 transaction,
-                TransactionStatus.Procced);
+                TransactionStatus.Proceed);
     }
 
     private async Task ProcessPayment(
@@ -113,7 +113,7 @@ public class TransactionProcessingService : ITransactionProcessingService
         await _transactionManagementService
             .UpdateTransactionStatusAsync(
                 transaction,
-                TransactionStatus.Procced);
+                TransactionStatus.Proceed);
     }
 
     private async Task<bool> ProccessDebitAsync(
