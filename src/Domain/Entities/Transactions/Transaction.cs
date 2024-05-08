@@ -3,11 +3,10 @@ using Defender.WalletService.Domain.Consts;
 using Defender.WalletService.Domain.Enums;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
-using Defender.Mongo.MessageBroker.Models.TopicMessage;
 
 namespace Defender.WalletService.Domain.Entities.Transactions;
 
-public class Transaction : BaseTopicMessage, IBaseModel
+public class Transaction : IBaseModel
 {
     public Guid Id { get; set; }
 
@@ -84,7 +83,7 @@ public class Transaction : BaseTopicMessage, IBaseModel
 
         return new Transaction()
         {
-            TransactionId = GenerateTransactionId(utcDateTime,type),
+            TransactionId = GenerateTransactionId(utcDateTime, type),
             TransactionType = type,
             TransactionStatus = TransactionStatus.Queued,
             UtcTransactionDate = utcDateTime,
@@ -96,7 +95,7 @@ public class Transaction : BaseTopicMessage, IBaseModel
     }
 
     private static string GenerateTransactionId(
-        DateTime transactionDate, 
+        DateTime transactionDate,
         TransactionType type)
     {
         var prefixMap = new Dictionary<TransactionType, string>()
@@ -107,9 +106,9 @@ public class Transaction : BaseTopicMessage, IBaseModel
         };
 
         return string.Format(
-            "{0}-{1}-{2}", 
+            "{0}-{1}-{2}",
             prefixMap[type],
-            $"{transactionDate:yyyyMMddHHmm}", 
+            $"{transactionDate:yyyyMMddHHmm}",
             new Random().Next(1000, 9999));
     }
 

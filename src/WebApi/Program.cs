@@ -22,8 +22,8 @@ builder.Logging.ClearProviders()
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddWebUIServices(builder.Environment, builder.Configuration);
-builder.Services.AddApplicationServices(builder.Configuration);
-builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructureServices();
 
 var app = builder.Build();
 

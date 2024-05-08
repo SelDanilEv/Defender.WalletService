@@ -31,29 +31,20 @@ public sealed class StartRechargeTransactionCommandValidator :
     }
 }
 
-public sealed class StartRechargeTransactionCommandHandler :
-    IRequestHandler<StartRechargeTransactionCommand, Transaction>
-{
-    private readonly ITransactionManagementService _transactionManagementService;
-    private readonly IWalletManagementService _walletManagementService;
-
-    public StartRechargeTransactionCommandHandler(
+public sealed class StartRechargeTransactionCommandHandler(
         ITransactionManagementService transactionManagementService,
         IWalletManagementService walletManagementService
-        )
-    {
-        _transactionManagementService = transactionManagementService;
-        _walletManagementService = walletManagementService;
-    }
-
+        ) :
+    IRequestHandler<StartRechargeTransactionCommand, Transaction>
+{
     public async Task<Transaction> Handle(
         StartRechargeTransactionCommand request,
         CancellationToken cancellationToken)
     {
-        var targetWallet = await _walletManagementService
+        var targetWallet = await walletManagementService
             .GetWalletByNumberAsync(request.TargetWalletNumber);
 
-        var transaction = await _transactionManagementService
+        var transaction = await transactionManagementService
                     .CreateRechargeTransactionAsync(
                         targetWallet.WalletNumber,
                         request.Amount,

@@ -35,34 +35,23 @@ public sealed class StartTransferTransactionCommandValidator :
     }
 }
 
-public sealed class StartTransferTransactionCommandHandler :
-    IRequestHandler<StartTransferTransactionCommand, Transaction>
-{
-    private readonly ICurrentAccountAccessor _currentAccountAccessor;
-    private readonly ITransactionManagementService _transactionManagementService;
-    private readonly IWalletManagementService _walletManagementService;
-
-    public StartTransferTransactionCommandHandler(
+public sealed class StartTransferTransactionCommandHandler(
         ICurrentAccountAccessor currentAccountAccessor,
         ITransactionManagementService transactionManagementService,
         IWalletManagementService walletManagementService
-        )
-    {
-        _currentAccountAccessor = currentAccountAccessor;
-        _transactionManagementService = transactionManagementService;
-        _walletManagementService = walletManagementService;
-    }
-
+        ) :
+    IRequestHandler<StartTransferTransactionCommand, Transaction>
+{
     public async Task<Transaction> Handle(
         StartTransferTransactionCommand request,
         CancellationToken cancellationToken)
     {
-        var userId = _currentAccountAccessor.GetAccountId();
+        var userId = currentAccountAccessor.GetAccountId();
 
-        var currentUserWallet = await _walletManagementService
+        var currentUserWallet = await walletManagementService
             .GetWalletByUserIdAsync(userId);
 
-        var targetWallet = await _walletManagementService
+        var targetWallet = await walletManagementService
             .GetWalletByNumberAsync(request.ToWalletNumber);
 
         if (targetWallet == null || currentUserWallet == null)
@@ -70,7 +59,7 @@ public sealed class StartTransferTransactionCommandHandler :
             throw new ServiceException(ErrorCode.BR_WLT_WalletIsNotExist);
         }
 
-        var transaction = await _transactionManagementService
+        var transaction = await transactionManagementService
                     .CreateTransferTransactionAsync(
                         currentUserWallet.WalletNumber,
                         targetWallet.WalletNumber,

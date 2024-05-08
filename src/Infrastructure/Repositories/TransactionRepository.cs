@@ -2,7 +2,6 @@
 using Defender.Common.DB.Model;
 using Defender.Common.DB.Pagination;
 using Defender.Common.DB.Repositories;
-using Defender.Mongo.MessageBroker.Helpers;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Domain.Entities.Transactions;
 using Microsoft.Extensions.Options;
@@ -10,13 +9,9 @@ using MongoDB.Driver;
 
 namespace Defender.WalletService.Infrastructure.Repositories;
 
-public class TransactionRepository : BaseMongoRepository<Transaction>, ITransactionRepository
+public class TransactionRepository(IOptions<MongoDbOptions> mongoOption) 
+    : BaseMongoRepository<Transaction>(mongoOption.Value), ITransactionRepository
 {
-    public TransactionRepository(IOptions<MongoDbOptions> mongoOption) : base(mongoOption.Value)
-    {
-    }
-
-
     public async Task<PagedResult<Transaction>> GetTransactionsAsync(
         PaginationRequest paginationRequest,
         int walletNumber)
@@ -51,15 +46,6 @@ public class TransactionRepository : BaseMongoRepository<Transaction>, ITransact
     public async Task<Transaction> CreateNewTransactionAsync(Transaction transaction)
     {
         return await AddItemAsync(transaction);
-    }
-
-    public async Task<Transaction> GetLastProceedTransaction()
-    {
-        var filter = Builders<Transaction>
-            .Filter.Ne(t => t.TransactionStatus,
-                Domain.Enums.TransactionStatus.Queued);
-
-        return await _mongoCollection.GetLastProceedEvent(filter);
     }
 
 }

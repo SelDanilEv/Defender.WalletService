@@ -32,26 +32,14 @@ public sealed class StartPaymentTransactionCommandValidator :
     }
 }
 
-public sealed class StartPaymentTransactionCommandHandler :
-    IRequestHandler<StartPaymentTransactionCommand, Transaction>
-{
-    private readonly ICurrentAccountAccessor _currentAccountAccessor;
-    private readonly IAuthorizationCheckingService _authorizationCheckingService;
-    private readonly ITransactionManagementService _transactionManagementService;
-    private readonly IWalletManagementService _walletManagementService;
-
-    public StartPaymentTransactionCommandHandler(
+public sealed class StartPaymentTransactionCommandHandler(
         IAuthorizationCheckingService authorizationCheckingService,
         ICurrentAccountAccessor currentAccountAccessor,
         ITransactionManagementService transactionManagementService,
         IWalletManagementService walletManagementService
-        )
-    {
-        _authorizationCheckingService = authorizationCheckingService;
-        _currentAccountAccessor = currentAccountAccessor;
-        _transactionManagementService = transactionManagementService;
-        _walletManagementService = walletManagementService;
-    }
+        ) :
+    IRequestHandler<StartPaymentTransactionCommand, Transaction>
+{
 
     public async Task<Transaction> Handle(
         StartPaymentTransactionCommand request,
@@ -59,21 +47,21 @@ public sealed class StartPaymentTransactionCommandHandler :
     {
         var transaction = default(Transaction);
 
-        var userId = _currentAccountAccessor.GetAccountId();
+        var userId = currentAccountAccessor.GetAccountId();
 
-        var currentUserWallet = await _walletManagementService
+        var currentUserWallet = await walletManagementService
             .GetWalletByUserIdAsync(userId);
 
         if (request.TargetWalletNumber.HasValue
             && currentUserWallet.WalletNumber != request.TargetWalletNumber.Value)
         {
-            var targetWallet = await _walletManagementService
+            var targetWallet = await walletManagementService
                 .GetWalletByNumberAsync(request.TargetWalletNumber.Value);
 
-            transaction = await _authorizationCheckingService
+            transaction = await authorizationCheckingService
                 .ExecuteWithAuthCheckAsync(
                     targetWallet.Id,
-                    async () => await _transactionManagementService
+                    async () => await transactionManagementService
                         .CreatePaymentTransactionAsync(
                             targetWallet.WalletNumber,
                             request.Amount,
@@ -81,7 +69,7 @@ public sealed class StartPaymentTransactionCommandHandler :
         }
         else
         {
-            transaction = await _transactionManagementService
+            transaction = await transactionManagementService
                 .CreatePaymentTransactionAsync(
                     currentUserWallet.WalletNumber,
                     request.Amount,

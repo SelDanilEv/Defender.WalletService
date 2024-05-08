@@ -13,5 +13,4 @@ public interface ITransactionRepository
     Task<Transaction> UpdateTransactionAsync(
         UpdateModelRequest<Transaction> updateRequest);
     Task<Transaction> CreateNewTransactionAsync(Transaction wallet);
-    Task<Transaction> GetLastProceedTransaction();
 }

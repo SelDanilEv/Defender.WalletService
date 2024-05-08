@@ -7,7 +7,7 @@ using Defender.Common.Errors;
 using Defender.Common.Exceptions;
 using Defender.Common.Exstension;
 using Defender.Common.Helpers;
-using Defender.WalletService.Application.Configuration.Exstension;
+using Defender.WalletService.Application.Configuration.Extensions;
 using FluentValidation.AspNetCore;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -101,7 +101,7 @@ public static class ConfigureServices
                 Scheme = "Bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token in the text input below.\r\n\r\nExample: \"1safsfsdfdfd\"",
+                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token in the text input below.\r\n\r\nExample: \"1sample\"",
             });
 
             options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -115,7 +115,7 @@ public static class ConfigureServices
                             Id = "Bearer"
                         }
                     },
-                    new string[] {}
+                    Array.Empty<string>()
                 }
             });
         });
@@ -129,25 +129,31 @@ public static class ConfigureServices
 
         options.Map<ValidationException>(exception =>
         {
-            var validationProblemDetails = new ValidationProblemDetails(exception.Errors);
-            validationProblemDetails.Detail = exception.Message;
-            validationProblemDetails.Status = StatusCodes.Status422UnprocessableEntity;
+            var validationProblemDetails = new ValidationProblemDetails(exception.Errors)
+            {
+                Detail = exception.Message,
+                Status = StatusCodes.Status422UnprocessableEntity
+            };
             return validationProblemDetails;
         });
 
         options.Map<ForbiddenAccessException>(exception =>
         {
-            var problemDetails = new ProblemDetails();
-            problemDetails.Detail = exception.Message;
-            problemDetails.Status = StatusCodes.Status403Forbidden;
+            var problemDetails = new ProblemDetails
+            {
+                Detail = exception.Message,
+                Status = StatusCodes.Status403Forbidden
+            };
             return problemDetails;
         });
 
         options.Map<ServiceException>(exception =>
         {
-            var problemDetails = new ProblemDetails();
-            problemDetails.Detail = exception.Message;
-            problemDetails.Status = StatusCodes.Status400BadRequest;
+            var problemDetails = new ProblemDetails
+            {
+                Detail = exception.Message,
+                Status = StatusCodes.Status400BadRequest
+            };
             return problemDetails;
         });
 
@@ -157,9 +163,11 @@ public static class ConfigureServices
 
         options.Map<Exception>(exception =>
         {
-            var problemDetails = new ProblemDetails();
-            problemDetails.Detail = ErrorCodeHelper.GetErrorCode(ErrorCode.UnhandledError);
-            problemDetails.Status = StatusCodes.Status500InternalServerError;
+            var problemDetails = new ProblemDetails
+            {
+                Detail = ErrorCodeHelper.GetErrorCode(ErrorCode.UnhandledError),
+                Status = StatusCodes.Status500InternalServerError
+            };
             return problemDetails;
         }); ;
     }

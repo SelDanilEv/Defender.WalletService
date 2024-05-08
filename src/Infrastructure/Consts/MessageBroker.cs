@@ -2,9 +2,9 @@
 
 internal class MessageBroker
 {
-    public record Topics
+    public record Queues
     {
-        public const string TransactionTopic = "incoming-transactions";
+        public const string TransactionEventQueue = "incoming-transactions";
     }
 
     public record MessageTypes

@@ -2,29 +2,30 @@
 using Defender.Common.DB.Pagination;
 using Defender.Common.Errors;
 using Defender.Common.Exceptions;
-using Defender.Mongo.MessageBroker.Interfaces;
+using Defender.Mongo.MessageBroker.Interfaces.Queue;
 using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Domain.Entities.Transactions;
 using Defender.WalletService.Domain.Enums;
 using Defender.WalletService.Infrastructure.Consts;
+using Defender.WalletService.Infrastructure.Models;
 
 namespace Defender.WalletService.Infrastructure.Services;
 
 public class TransactionManagementService : ITransactionManagementService
 {
     private readonly ITransactionRepository _transactionRepository;
-    private readonly IProducer _messageProducer;
+    private readonly IQueueProducer _messageProducer;
 
     public TransactionManagementService(
         ITransactionRepository transactionRepository,
-        IProducer messageProducer)
+        IQueueProducer messageProducer)
     {
         _transactionRepository = transactionRepository;
 
         _messageProducer = messageProducer;
 
-        _messageProducer.SetTopic(MessageBroker.Topics.TransactionTopic);
+        _messageProducer.SetQueue(MessageBroker.Queues.TransactionEventQueue);
         _messageProducer.SetMessageType(MessageBroker.MessageTypes.Transaction);
     }
 
@@ -112,10 +113,15 @@ public class TransactionManagementService : ITransactionManagementService
 
     private async Task<Transaction> CreateTransactionBaseAsync(Transaction transaction)
     {
+        var transactionEvent = new TransactionEvent
+        {
+            TransactionId = transaction.TransactionId,
+        };
+
+        await _messageProducer.PublishQueueAsync(transactionEvent);
+
         transaction = await _transactionRepository
             .CreateNewTransactionAsync(transaction);
-
-        await _messageProducer.PublishAsync(transaction);
 
         return transaction;
     }

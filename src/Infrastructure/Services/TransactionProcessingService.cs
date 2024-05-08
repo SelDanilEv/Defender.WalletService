@@ -4,7 +4,9 @@ using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Domain.Entities.Transactions;
 using Defender.WalletService.Domain.Enums;
+using Defender.WalletService.Infrastructure.Common.Interfaces;
 using Defender.WalletService.Infrastructure.Mappings;
+using Defender.WalletService.Infrastructure.Models;
 using MongoDB.Driver;
 
 namespace Defender.WalletService.Infrastructure.Services;
@@ -14,8 +16,8 @@ public class TransactionProcessingService : ITransactionProcessingService
     private readonly ITransactionManagementService _transactionManagementService;
     private readonly IWalletRepository _walletRepository;
 
-    private readonly TransactionTypeActionMapper transactionTypeMap =
-        new TransactionTypeActionMapper();
+    private readonly TransactionTypeActionMapper _transactionTypeMap =
+        [];
 
     public TransactionProcessingService(
         ITransactionManagementService transactionManagementService,
@@ -24,19 +26,30 @@ public class TransactionProcessingService : ITransactionProcessingService
         _transactionManagementService = transactionManagementService;
         _walletRepository = walletRepository;
 
-        transactionTypeMap.Add(TransactionType.Recharge, ProcessRecharge);
-        transactionTypeMap.Add(TransactionType.Transfer, ProcessTransfer);
-        transactionTypeMap.Add(TransactionType.Payment, ProcessPayment);
+        _transactionTypeMap = new TransactionTypeActionMapper
+            {
+                {TransactionType.Recharge, ProcessRecharge },
+                {TransactionType.Transfer, ProcessTransfer },
+                {TransactionType.Payment, ProcessPayment }
+            };
     }
 
-    public async Task<TransactionStatus> ProcessTransaction(
-        Transaction transaction)
+    public async Task<bool> ProcessTransaction(TransactionEvent transactionEvent)
     {
+        if (transactionEvent == null || string.IsNullOrWhiteSpace(transactionEvent.TransactionId))
+            return true;
+
+        var transaction = await _transactionManagementService
+            .GetTransactionByTransactionIdAsync(transactionEvent.TransactionId);
+
+        if(transaction == null || transaction.TransactionStatus != TransactionStatus.Queued)
+            return true;
+
         try
         {
             var mongoSession = await _walletRepository.StartSessionAsync();
 
-            transactionTypeMap.TryGetValue(
+            _transactionTypeMap.TryGetValue(
                     transaction.TransactionType, out var processAction);
 
             if (processAction == null)
@@ -44,7 +57,7 @@ public class TransactionProcessingService : ITransactionProcessingService
                 transaction = await _transactionManagementService
                     .UpdateTransactionStatusAsync(transaction, TransactionStatus.Failed);
 
-                return transaction.TransactionStatus;
+                return true;
             }
 
             var isSucceeded = await MongoTransactionHelper
@@ -60,19 +73,21 @@ public class TransactionProcessingService : ITransactionProcessingService
         }
         catch
         {
-            transaction = await _transactionManagementService
+            await _transactionManagementService
                 .UpdateTransactionStatusAsync(transaction, TransactionStatus.Failed);
+
+            return true;
         }
 
 
-        return transaction.TransactionStatus;
+        return transaction.TransactionStatus != TransactionStatus.Queued;
     }
 
     private async Task ProcessRecharge(
         Transaction transaction,
         IClientSessionHandle sessionHandle)
     {
-        await ProccessDebitAsync(transaction, sessionHandle);
+        await ProcessDebitAsync(transaction, sessionHandle);
 
         await _transactionManagementService
             .UpdateTransactionStatusAsync(
@@ -93,9 +108,9 @@ public class TransactionProcessingService : ITransactionProcessingService
         }
 
         var isStepSuccess =
-            await ProccessCreditAsync(transaction, sessionHandle);
+            await ProcessCreditAsync(transaction, sessionHandle);
         if (isStepSuccess)
-            await ProccessDebitAsync(transaction, sessionHandle);
+            await ProcessDebitAsync(transaction, sessionHandle);
 
         if (isStepSuccess)
             await _transactionManagementService
@@ -108,7 +123,7 @@ public class TransactionProcessingService : ITransactionProcessingService
         Transaction transaction,
         IClientSessionHandle sessionHandle)
     {
-        await ProccessCreditAsync(transaction, sessionHandle);
+        await ProcessCreditAsync(transaction, sessionHandle);
 
         await _transactionManagementService
             .UpdateTransactionStatusAsync(
@@ -116,7 +131,7 @@ public class TransactionProcessingService : ITransactionProcessingService
                 TransactionStatus.Proceed);
     }
 
-    private async Task<bool> ProccessDebitAsync(
+    private async Task<bool> ProcessDebitAsync(
         Transaction transaction,
         IClientSessionHandle sessionHandle)
     {
@@ -151,7 +166,7 @@ public class TransactionProcessingService : ITransactionProcessingService
         return true;
     }
 
-    private async Task<bool> ProccessCreditAsync(
+    private async Task<bool> ProcessCreditAsync(
         Transaction transaction,
         IClientSessionHandle sessionHandle)
     {
@@ -200,10 +215,7 @@ public class TransactionProcessingService : ITransactionProcessingService
         T parameter,
         IClientSessionHandle sessionHandle)
     {
-        return async () =>
-        {
-            await func(parameter, sessionHandle);
-        };
+        return async () => await func(parameter, sessionHandle);
     }
 
     private async Task<Transaction> HandleError(
@@ -212,9 +224,9 @@ public class TransactionProcessingService : ITransactionProcessingService
     {
         return await _transactionManagementService
             .UpdateTransactionStatusAsync(
-            transaction,
-            TransactionStatus.Failed,
-            error);
+                transaction,
+                TransactionStatus.Failed,
+                error);
     }
 
 }
