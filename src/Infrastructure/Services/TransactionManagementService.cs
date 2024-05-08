@@ -113,15 +113,15 @@ public class TransactionManagementService : ITransactionManagementService
 
     private async Task<Transaction> CreateTransactionBaseAsync(Transaction transaction)
     {
+        transaction = await _transactionRepository
+            .CreateNewTransactionAsync(transaction);
+
         var transactionEvent = new TransactionEvent
         {
             TransactionId = transaction.TransactionId,
         };
 
         await _messageProducer.PublishQueueAsync(transactionEvent);
-
-        transaction = await _transactionRepository
-            .CreateNewTransactionAsync(transaction);
 
         return transaction;
     }

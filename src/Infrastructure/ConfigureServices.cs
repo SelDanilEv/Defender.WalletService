@@ -54,7 +54,8 @@ public static class ConfigureServices
         services.AddTransient<ITransactionManagementService, TransactionManagementService>();
         services.AddTransient<ITransactionProcessingService, TransactionProcessingService>();
 
-        services.AddHostedService<TransactionConsumerService>();
+        services.AddHostedService<TransactionEventConsumerService>();
+        services.AddHostedService<TransactionEventRetryingConsumerService>();
 
         return services;
     }

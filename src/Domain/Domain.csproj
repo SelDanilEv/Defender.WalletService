@@ -16,7 +16,6 @@
 
     <ItemGroup>
         <!--<ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" />-->
-        <!--<ProjectReference Include="..\..\..\Defender.Mongo.MessageBroker\src\Defender.Mongo.MessageBroker\Defender.Mongo.MessageBroker.csproj" />-->
     </ItemGroup>
 
 </Project>
