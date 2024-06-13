@@ -1,11 +1,11 @@
 using Defender.WalletService.Application;
 using Defender.WalletService.Infrastructure;
-using Defender.WalletService.WebUI;
+using Defender.WalletService.WebApi;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Defender.Common.Exstension;
+using Defender.Common.Extension;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
@@ -23,7 +23,7 @@ builder.Logging.ClearProviders()
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddWebUIServices(builder.Environment, builder.Configuration);
 builder.Services.AddApplicationServices();
-builder.Services.AddInfrastructureServices();
+builder.Services.AddInfrastructureServices(builder.Environment);
 
 var app = builder.Build();
 

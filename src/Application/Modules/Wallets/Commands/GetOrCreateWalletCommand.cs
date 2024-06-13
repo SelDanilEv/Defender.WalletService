@@ -2,6 +2,7 @@
 using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Domain.Entities.Wallets;
 using FluentValidation;
+using Defender.Common.Extension;
 using MediatR;
 
 namespace Defender.WalletService.Application.Modules.Wallets.Commands;
@@ -41,10 +42,7 @@ public sealed class GetOrCreateWalletCommandHandler(
     {
         var wallet = await walletManagementService.GetWalletByUserIdAsync(userId);
 
-        if (wallet == null)
-        {
-            wallet = await walletManagementService.CreateNewWalletAsync(userId);
-        }
+        wallet ??= await walletManagementService.CreateNewWalletAsync(userId);
 
         return wallet;
     }

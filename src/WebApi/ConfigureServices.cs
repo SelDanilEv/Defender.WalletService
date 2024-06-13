@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 using Defender.Common.Enums;
 using Defender.Common.Errors;
 using Defender.Common.Exceptions;
-using Defender.Common.Exstension;
+using Defender.Common.Extension;
 using Defender.Common.Helpers;
 using Defender.WalletService.Application.Configuration.Extensions;
 using FluentValidation.AspNetCore;
@@ -20,7 +20,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProblemDetailsOptions = Hellang.Middleware.ProblemDetails.ProblemDetailsOptions;
 
-namespace Defender.WalletService.WebUI;
+namespace Defender.WalletService.WebApi;
 
 public static class ConfigureServices
 {

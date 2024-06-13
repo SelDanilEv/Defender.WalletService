@@ -6,11 +6,11 @@ using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Domain.Entities.Wallets;
 using Defender.WalletService.Domain.Enums;
 
-namespace Defender.WalletService.Infrastructure.Services;
+namespace Defender.WalletService.Application.Services;
 
 public class WalletManagementService(
         IWalletRepository walletRepository,
-        ICurrentAccountAccessor currentAccountAccessor) 
+        ICurrentAccountAccessor currentAccountAccessor)
     : IWalletManagementService
 {
     public async Task<Wallet> GetWalletByUserIdAsync(Guid userId)
@@ -28,15 +28,15 @@ public class WalletManagementService(
         var wallet = new Wallet
         {
             Id = userId ?? currentAccountAccessor.GetAccountId(),
-            CurrencyAccounts = new HashSet<CurrencyAccount>
-            {
+            CurrencyAccounts =
+            [
                 new CurrencyAccount
                 {
                     Currency = Currency.USD,
                     Balance = 0,
                     IsDefault = true,
                 }
-            }
+            ]
         };
 
         return await walletRepository.CreateNewWalletAsync(wallet);
@@ -53,7 +53,7 @@ public class WalletManagementService(
             .FirstOrDefault(x => x.Currency == currency) != null)
         {
             throw new ServiceException(
-                ErrorCode.BR_WLT_CurrencyAccountAlredyExist);
+                ErrorCode.BR_WLT_CurrencyAccountAlreadyExist);
         }
 
         if (isDefault)

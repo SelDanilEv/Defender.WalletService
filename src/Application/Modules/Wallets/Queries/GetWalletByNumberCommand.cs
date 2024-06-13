@@ -3,6 +3,7 @@ using Defender.Common.Exceptions;
 using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Domain.Entities.Wallets;
 using FluentValidation;
+using Defender.Common.Extension;
 using MediatR;
 
 namespace Defender.WalletService.Application.Modules.Wallets.Queries;
@@ -18,9 +19,9 @@ public sealed class GetWalletInfoByNumberQueryValidator : AbstractValidator<GetW
     {
         RuleFor(x => x.WalletNumber)
             .NotNull()
-            .WithMessage(ErrorCodeHelper.GetErrorCode(ErrorCode.VL_WLT_EmptyWalletNumber))
+            .WithMessage(ErrorCode.VL_WLT_EmptyWalletNumber)
             .InclusiveBetween(10000000, 99999999)
-            .WithMessage(ErrorCodeHelper.GetErrorCode(ErrorCode.VL_WLT_InvalidWalletNumber));
+            .WithMessage(ErrorCode.VL_WLT_InvalidWalletNumber);
     }
 }
 

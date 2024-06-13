@@ -10,14 +10,11 @@ using Defender.Common.DB.Pagination;
 using Defender.WalletService.Application.Modules.Transactions.Commands;
 using Defender.Common.Consts;
 
-namespace Defender.WalletService.WebUI.Controllers.V1;
+namespace Defender.WalletService.WebApi.Controllers.V1;
 
-public class TransactionController : BaseApiController
+public class TransactionController(IMediator mediator, IMapper mapper)
+    : BaseApiController(mediator, mapper)
 {
-    public TransactionController(IMediator mediator, IMapper mapper) : base(mediator, mapper)
-    {
-    }
-
     [HttpGet("status")]
     [Auth(Roles.User)]
     [ProducesResponseType(typeof(AnonymousTransactionDto), StatusCodes.Status200OK)]
@@ -50,7 +47,7 @@ public class TransactionController : BaseApiController
         [FromBody] StartPaymentTransactionCommand command)
     {
         return await ProcessApiCallAsync<
-            StartPaymentTransactionCommand, 
+            StartPaymentTransactionCommand,
             TransactionDto>(command);
     }
 
@@ -72,6 +69,16 @@ public class TransactionController : BaseApiController
         [FromBody] StartTransferTransactionCommand command)
     {
         return await ProcessApiCallAsync<StartTransferTransactionCommand, TransactionDto>(command);
+    }
+
+    [HttpDelete("cancel")]
+    [Auth(Roles.SuperAdmin)]
+    [ProducesResponseType(typeof(TransactionDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<TransactionDto> CancelTransactionAsync(
+        [FromBody] CancelTransactionCommand command)
+    {
+        return await ProcessApiCallAsync<CancelTransactionCommand, TransactionDto>(command);
     }
 
 }

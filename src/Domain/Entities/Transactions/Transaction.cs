@@ -3,6 +3,7 @@ using Defender.WalletService.Domain.Consts;
 using Defender.WalletService.Domain.Enums;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
+using Defender.Common.DB.SharedStorage.Enums;
 
 namespace Defender.WalletService.Domain.Entities.Transactions;
 
@@ -11,10 +12,13 @@ public class Transaction : IBaseModel
     public Guid Id { get; set; }
 
     public string? TransactionId { get; set; }
+    public string? ParentTransactionId { get; set; }
     [BsonRepresentation(BsonType.String)]
     public TransactionStatus TransactionStatus { get; set; }
     [BsonRepresentation(BsonType.String)]
     public TransactionType TransactionType { get; set; }
+    [BsonRepresentation(BsonType.String)]
+    public TransactionPurpose TransactionPurpose { get; set; }
     public int FromWallet { get; set; }
     public int ToWallet { get; set; }
     public int Amount { get; set; }
@@ -27,57 +31,75 @@ public class Transaction : IBaseModel
 
     #region Creators 
 
-    public static Transaction CreateRecharge(
-        Currency currency,
-        int amount,
-        int toWallet)
+    public class CreateTransactionRequest
+    {
+        public int TargetWallet { get; set; }
+        public Currency Currency { get; set; }
+        public int Amount { get; set; }
+        public string? Comment { get; set; }
+        public TransactionPurpose TransactionPurpose { get; set; }
+            = TransactionPurpose.NoPurpose;
+    }
+
+    public static Transaction CreateRecharge(CreateTransactionRequest request)
     {
         var transaction = CreateBaseTransaction(
             TransactionType.Recharge,
-            currency,
-            amount);
+            request);
 
-        transaction.ToWallet = toWallet;
+        transaction.ToWallet = request.TargetWallet;
 
         return transaction;
     }
 
-    public static Transaction CreateTransfer(
-    Currency currency,
-    int amount,
-    int toWallet,
-    int fromWallet)
+    public static Transaction CreateTransfer(CreateTransactionRequest request, int fromWallet)
     {
         var transaction = CreateBaseTransaction(
             TransactionType.Transfer,
-            currency,
-            amount);
+            request);
 
-        transaction.ToWallet = toWallet;
+        transaction.ToWallet = request.TargetWallet;
         transaction.FromWallet = fromWallet;
 
         return transaction;
     }
 
     public static Transaction CreatePayment(
-    Currency currency,
-    int amount,
-    int fromWallet)
+        CreateTransactionRequest request)
     {
         var transaction = CreateBaseTransaction(
             TransactionType.Payment,
-            currency,
-            amount);
+            request);
 
-        transaction.FromWallet = fromWallet;
+        transaction.FromWallet = request.TargetWallet;
 
         return transaction;
     }
 
+    public static Transaction CreateCancelation(
+    Transaction parentTransaction)
+    {
+        var utcDateTime = DateTime.UtcNow;
+
+        return new Transaction()
+        {
+            TransactionId = GenerateTransactionId(utcDateTime, TransactionType.Revert),
+            ParentTransactionId = parentTransaction.TransactionId,
+            TransactionType = TransactionType.Revert,
+            TransactionPurpose = parentTransaction.TransactionPurpose,
+            TransactionStatus = TransactionStatus.Queued,
+            UtcTransactionDate = utcDateTime,
+            Currency = parentTransaction.Currency,
+            Amount = parentTransaction.Amount,
+            ToWallet = parentTransaction.FromWallet,
+            FromWallet = parentTransaction.ToWallet,
+            Comment = parentTransaction.Comment,
+        };
+    }
+
     private static Transaction CreateBaseTransaction(
-            TransactionType type,
-            Currency currency,
-            int amount)
+        TransactionType type,
+        CreateTransactionRequest request)
     {
         var utcDateTime = DateTime.UtcNow;
 
@@ -85,16 +107,18 @@ public class Transaction : IBaseModel
         {
             TransactionId = GenerateTransactionId(utcDateTime, type),
             TransactionType = type,
+            TransactionPurpose = request.TransactionPurpose,
             TransactionStatus = TransactionStatus.Queued,
             UtcTransactionDate = utcDateTime,
-            Currency = currency,
-            Amount = amount,
+            Currency = request.Currency,
+            Amount = request.Amount,
             ToWallet = ConstantValues.NoWallet,
             FromWallet = ConstantValues.NoWallet,
+            Comment = request.Comment,
         };
     }
 
-    private static string GenerateTransactionId(
+    protected static string GenerateTransactionId(
         DateTime transactionDate,
         TransactionType type)
     {
@@ -103,6 +127,7 @@ public class Transaction : IBaseModel
             { TransactionType.Payment, "PAY" },
             { TransactionType.Recharge, "RCH" },
             { TransactionType.Transfer, "TRN" },
+            { TransactionType.Revert, "CNL" },
         };
 
         return string.Format(

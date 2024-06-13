@@ -1,12 +1,15 @@
-﻿using Defender.WalletService.Domain.Enums;
+﻿using Defender.Common.DB.SharedStorage.Enums;
+using Defender.WalletService.Domain.Enums;
 
 namespace Defender.WalletService.Application.DTOs;
 
 public class TransactionDto
 {
     public string? TransactionId { get; set; }
+    public string? ParentTransactionId { get; set; }
     public TransactionStatus TransactionStatus { get; set; }
     public TransactionType TransactionType { get; set; }
+    public TransactionPurpose TransactionPurpose { get; set; }
     public Currency Currency { get; set; }
 
     public int Amount { get; set; }

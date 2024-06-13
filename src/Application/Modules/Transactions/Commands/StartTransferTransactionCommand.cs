@@ -4,13 +4,13 @@ using Defender.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Domain.Entities.Transactions;
 using FluentValidation;
+using Defender.Common.Extension;
 using MediatR;
 
 namespace Defender.WalletService.Application.Modules.Transactions.Commands;
 
 public record StartTransferTransactionCommand : BaseTransactionCommand, IRequest<Transaction>
 {
-    public int ToWalletNumber { get; set; }
 };
 
 public sealed class StartTransferTransactionCommandValidator :
@@ -18,20 +18,16 @@ public sealed class StartTransferTransactionCommandValidator :
 {
     public StartTransferTransactionCommandValidator()
     {
-        {
-            RuleFor(x => x.ToWalletNumber)
+        When(x => !x.TargetUserId.HasValue, () =>
+            RuleFor(x => x.TargetWalletNumber)
                 .NotEmpty()
-                .WithMessage(ErrorCodeHelper.GetErrorCode(
-                    ErrorCode.VL_WLT_EmptyWalletNumber))
+                .WithMessage(ErrorCode.VL_WLT_EmptyWalletNumber)
                 .InclusiveBetween(10000000, 99999999)
-                .WithMessage(ErrorCodeHelper.GetErrorCode(
-                    ErrorCode.VL_WLT_InvalidWalletNumber));
+                .WithMessage(ErrorCode.VL_WLT_InvalidWalletNumber));
 
-            RuleFor(x => x.Amount)
-                .GreaterThan(0)
-                .WithMessage(ErrorCodeHelper.GetErrorCode(
-                    ErrorCode.VL_WLT_TransferAmountMustBePositive));
-        }
+        RuleFor(x => x.Amount)
+            .GreaterThan(0)
+            .WithMessage(ErrorCode.VL_WLT_TransferAmountMustBePositive);
     }
 }
 
@@ -49,23 +45,21 @@ public sealed class StartTransferTransactionCommandHandler(
         var userId = currentAccountAccessor.GetAccountId();
 
         var currentUserWallet = await walletManagementService
-            .GetWalletByUserIdAsync(userId);
+            .GetWalletByUserIdAsync(userId)
+        ?? throw new ServiceException(ErrorCode.BR_WLT_WalletIsNotExist);
 
-        var targetWallet = await walletManagementService
-            .GetWalletByNumberAsync(request.ToWalletNumber);
+        var targetWallet = request.TargetUserId.HasValue
+            ? await walletManagementService
+                .GetWalletByUserIdAsync(request.TargetUserId!.Value)
+            : await walletManagementService
+                .GetWalletByNumberAsync(request.TargetWalletNumber)
+        ?? throw new ServiceException(ErrorCode.BR_WLT_WalletIsNotExist);
 
-        if (targetWallet == null || currentUserWallet == null)
-        {
-            throw new ServiceException(ErrorCode.BR_WLT_WalletIsNotExist);
-        }
+        request.TargetWalletNumber = targetWallet.WalletNumber;
 
-        var transaction = await transactionManagementService
+        return await transactionManagementService
                     .CreateTransferTransactionAsync(
                         currentUserWallet.WalletNumber,
-                        targetWallet.WalletNumber,
-                        request.Amount,
-                        request.Currency);
-
-        return transaction;
+                        request.CreateTransactionRequest);
     }
 }

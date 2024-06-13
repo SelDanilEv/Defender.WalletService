@@ -1,7 +1,7 @@
 ﻿using Defender.Common.DB.Pagination;
+using Defender.Common.DB.SharedStorage.Enums;
 using Defender.Common.Errors;
 using Defender.WalletService.Domain.Entities.Transactions;
-using Defender.WalletService.Domain.Enums;
 
 namespace Defender.WalletService.Application.Common.Interfaces;
 
@@ -25,19 +25,16 @@ public interface ITransactionManagementService
         ErrorCode error);
 
     Task<Transaction> CreateRechargeTransactionAsync(
-        int wallet, 
-        int amount, 
-        Currency currency);
+        Transaction.CreateTransactionRequest request);
 
     Task<Transaction> CreateTransferTransactionAsync(
         int fromWallet, 
-        int toWallet,
-        int amount,
-        Currency currency);
+        Transaction.CreateTransactionRequest request);
 
     Task<Transaction> CreatePaymentTransactionAsync(
-        int wallet,
-        int amount, 
-        Currency currency);
+        Transaction.CreateTransactionRequest request);
+
+    Task<Transaction> CancelTransactionAsync(
+        string transactionId);
 
 }

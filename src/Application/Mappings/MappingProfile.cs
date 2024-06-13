@@ -1,4 +1,3 @@
-using Defender.Common.DB.Pagination;
 using Defender.Common.Mapping;
 using Defender.WalletService.Application.DTOs;
 using Defender.WalletService.Domain.Entities.Transactions;
@@ -24,5 +23,6 @@ public class MappingProfile : BaseMappingProfile
                 opt => opt.MapFrom(src => src.CurrencyAccounts.Select(x => x.Currency)));
 
         CreateMap<Transaction, TransactionDto>();
+        CreateMap<Transaction, AnonymousTransactionDto>();
     }
 }

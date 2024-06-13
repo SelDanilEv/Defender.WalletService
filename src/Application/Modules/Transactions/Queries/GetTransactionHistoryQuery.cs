@@ -3,6 +3,7 @@ using Defender.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Domain.Entities.Transactions;
 using FluentValidation;
+using Defender.Common.Extension;
 using MediatR;
 
 namespace Defender.NotificationService.Application.Modules.Monitoring.Queries;

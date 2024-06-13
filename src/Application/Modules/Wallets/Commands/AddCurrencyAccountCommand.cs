@@ -3,6 +3,7 @@ using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Domain.Entities.Wallets;
 using Defender.WalletService.Domain.Enums;
 using FluentValidation;
+using Defender.Common.Extension;
 using MediatR;
 
 namespace Defender.WalletService.Application.Modules.Wallets.Commands;

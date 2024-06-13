@@ -1,15 +1,20 @@
 ﻿using System.Reflection;
 using Defender.Common.Configuration.Options;
+using Defender.Common.DB.SharedStorage.Entities;
+using Defender.Common.Extension;
 using Defender.Mongo.MessageBroker.Extensions;
 using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
-using Defender.WalletService.Infrastructure.Common.Interfaces;
+using Defender.WalletService.Application.Common.Interfaces.Services;
+using Defender.WalletService.Application.Configuration.Options;
+using Defender.WalletService.Application.Configuration.Options.Shared;
+using Defender.WalletService.Application.Events;
+using Defender.WalletService.Application.Services;
+using Defender.WalletService.Application.Services.Background;
 using Defender.WalletService.Infrastructure.Repositories;
 using Defender.WalletService.Infrastructure.Repositories.DomainModels;
-using Defender.WalletService.Infrastructure.Services;
-using Defender.WalletService.Infrastructure.Services.Background;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace Defender.WalletService.Infrastructure;
@@ -17,26 +22,22 @@ namespace Defender.WalletService.Infrastructure;
 public static class ConfigureServices
 {
     public static IServiceCollection AddInfrastructureServices(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        IHostEnvironment environment)
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+        var mongoDbOptions = services
+            .BuildServiceProvider()
+            .GetRequiredService<IOptions<MongoDbOptions>>()
+            .Value;
+
         services
-            .RegisterServices()
             .RegisterRepositories()
             .RegisterApiClients()
-            .RegisterClientWrappers();
+            .RegisterClientWrappers()
+            .RegisterMessageBroker(environment, mongoDbOptions);
 
-        services.AddMongoMessageBrokerServices(opt =>
-        {
-            var mongoDbOptions = services
-                .BuildServiceProvider()
-                .GetRequiredService<IOptions<MongoDbOptions>>()
-                .Value;
-
-            opt.MongoDbConnectionString = mongoDbOptions.ConnectionString;
-            opt.MongoDbDatabaseName = mongoDbOptions.GetDatabaseName();
-        });
 
         return services;
     }
@@ -48,14 +49,25 @@ public static class ConfigureServices
         return services;
     }
 
-    private static IServiceCollection RegisterServices(this IServiceCollection services)
+    private static IServiceCollection RegisterMessageBroker(
+        this IServiceCollection services,
+        IHostEnvironment environment,
+        MongoDbOptions baseDbOptions)
     {
-        services.AddTransient<IWalletManagementService, WalletManagementService>();
-        services.AddTransient<ITransactionManagementService, TransactionManagementService>();
-        services.AddTransient<ITransactionProcessingService, TransactionProcessingService>();
+        services.AddQueueConsumer<NewTransactionCreatedEvent>(opt =>
+        {
+            opt.ApplyOptions(new NewTransactionQueueOptions(baseDbOptions));
+        });
 
-        services.AddHostedService<TransactionEventConsumerService>();
-        services.AddHostedService<TransactionEventRetryingConsumerService>();
+        services.AddQueueProducer<NewTransactionCreatedEvent>(opt =>
+        {
+            opt.ApplyOptions(new NewTransactionQueueOptions(baseDbOptions));
+        });
+
+        services.AddTopicProducer<TransactionStatusUpdatedEvent>(opt =>
+        {
+            opt.ApplyOptions(new TransactionStatusesTopicProducerOptions(environment.GetAppEnvironment()));
+        });
 
         return services;
     }

@@ -9,11 +9,17 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="Enums\**" />
+      <EmbeddedResource Remove="Enums\**" />
+      <None Remove="Enums\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Application\Application.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Defender.Mongo.MessageBroker" Version="8.0.7" />
+      <PackageReference Include="Defender.Mongo.MessageBroker" Version="8.1.1" />
       <PackageReference Include="Defender.Utils" Version="1.0.9" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
       <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.2.0" />
@@ -23,9 +29,9 @@
     </ItemGroup>
 
 
-    <ItemGroup>
-        <!--<ProjectReference Include="..\..\..\Defender.Mongo.MessageBroker\src\Defender.Mongo.MessageBroker\Defender.Mongo.MessageBroker.csproj" />-->
-    </ItemGroup>
+    <!-- <ItemGroup>
+        <ProjectReference Include="..\..\..\Defender.Mongo.MessageBroker\src\Defender.Mongo.MessageBroker\Defender.Mongo.MessageBroker.csproj" />
+    </ItemGroup> -->
 
 
     <ItemGroup>
@@ -86,7 +92,6 @@
 
     <ItemGroup>
       <Folder Include="Clients\Service\" />
-      <Folder Include="Enums\" />
     </ItemGroup>
 
 </Project>

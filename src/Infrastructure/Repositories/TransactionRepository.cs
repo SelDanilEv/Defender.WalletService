@@ -5,7 +5,6 @@ using Defender.Common.DB.Repositories;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Domain.Entities.Transactions;
 using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 
 namespace Defender.WalletService.Infrastructure.Repositories;
 

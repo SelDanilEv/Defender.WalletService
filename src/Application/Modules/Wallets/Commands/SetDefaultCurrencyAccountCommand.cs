@@ -21,17 +21,17 @@ public sealed class SetDefaultCurrencyAccountCommandValidator :
 }
 
 public sealed class SetDefaultCurrencyAccountCommandHandler(
-        ICurrentAccountAccessor _currentAccountAccessor,
-        IWalletManagementService _walletManagementService)
+        ICurrentAccountAccessor currentAccountAccessor,
+        IWalletManagementService walletManagementService)
     : IRequestHandler<SetDefaultCurrencyAccountCommand, Wallet>
 {
     public async Task<Wallet> Handle(
         SetDefaultCurrencyAccountCommand request,
         CancellationToken cancellationToken)
     {
-        var userId = _currentAccountAccessor.GetAccountId();
+        var userId = currentAccountAccessor.GetAccountId();
 
-        var wallet = await _walletManagementService
+        var wallet = await walletManagementService
             .SetDefaultCurrencyAccountAsync(userId, request.Currency);
 
         return wallet;

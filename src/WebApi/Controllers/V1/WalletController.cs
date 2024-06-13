@@ -9,7 +9,7 @@ using Defender.WalletService.Application.DTOs;
 using Defender.WalletService.Application.Modules.Wallets.Commands;
 using Defender.WalletService.Application.Modules.Wallets.Queries;
 
-namespace Defender.WalletService.WebUI.Controllers.V1;
+namespace Defender.WalletService.WebApi.Controllers.V1;
 
 public class WalletController(IMediator mediator, IMapper mapper) : BaseApiController(mediator, mapper)
 {

@@ -3,21 +3,22 @@ using Defender.Common.Helpers;
 using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Domain.Entities.Transactions;
-using Defender.WalletService.Domain.Enums;
-using Defender.WalletService.Infrastructure.Common.Interfaces;
-using Defender.WalletService.Infrastructure.Mappings;
-using Defender.WalletService.Infrastructure.Models;
+using Defender.WalletService.Domain.Consts;
 using MongoDB.Driver;
+using Defender.Common.DB.SharedStorage.Enums;
+using Defender.WalletService.Application.Common.Interfaces.Services;
+using Defender.WalletService.Application.Events;
+using Defender.WalletService.Application.Mappings;
 
-namespace Defender.WalletService.Infrastructure.Services;
+namespace Defender.WalletService.Application.Services;
 
 public class TransactionProcessingService : ITransactionProcessingService
 {
+    private const int WriteConflictErrorCode = 112;
     private readonly ITransactionManagementService _transactionManagementService;
     private readonly IWalletRepository _walletRepository;
 
-    private readonly TransactionTypeActionMapper _transactionTypeMap =
-        [];
+    private readonly TransactionTypeActionMapper _transactionTypeMap = [];
 
     public TransactionProcessingService(
         ITransactionManagementService transactionManagementService,
@@ -30,19 +31,21 @@ public class TransactionProcessingService : ITransactionProcessingService
             {
                 {TransactionType.Recharge, ProcessRecharge },
                 {TransactionType.Transfer, ProcessTransfer },
-                {TransactionType.Payment, ProcessPayment }
+                {TransactionType.Payment, ProcessPayment },
+                {TransactionType.Revert, ProcessRevert }
             };
     }
 
-    public async Task<bool> ProcessTransaction(TransactionEvent transactionEvent)
+    public async Task<bool> ProcessTransaction(NewTransactionCreatedEvent transactionEvent)
     {
-        if (transactionEvent == null || string.IsNullOrWhiteSpace(transactionEvent.TransactionId))
+        if (transactionEvent == null
+            || string.IsNullOrWhiteSpace(transactionEvent.TransactionId))
             return true;
 
         var transaction = await _transactionManagementService
             .GetTransactionByTransactionIdAsync(transactionEvent.TransactionId);
 
-        if(transaction == null || transaction.TransactionStatus != TransactionStatus.Queued)
+        if (transaction == null || transaction.TransactionStatus != TransactionStatus.Queued)
             return true;
 
         try
@@ -54,27 +57,25 @@ public class TransactionProcessingService : ITransactionProcessingService
 
             if (processAction == null)
             {
-                transaction = await _transactionManagementService
-                    .UpdateTransactionStatusAsync(transaction, TransactionStatus.Failed);
+                transaction = await HandleError(transaction, ErrorCode.UnhandledError);
 
                 return true;
             }
 
-            var isSucceeded = await MongoTransactionHelper
-                .ExecuteUnderTransactionAsync(
+            var (isSucceeded, er) = await MongoTransactionHelper
+                .ExecuteUnderTransactionWithExceptionAsync(
                     mongoSession,
                     MapToFunc(processAction, transaction, mongoSession));
 
-            if (!isSucceeded)
-            {
-                transaction = await _transactionManagementService
-                    .UpdateTransactionStatusAsync(transaction, TransactionStatus.Failed);
-            }
+            if (isSucceeded) return true;
+
+            if (er != null && er.Code == WriteConflictErrorCode) return false;
+
+            transaction = await HandleError(transaction, ErrorCode.UnhandledError);
         }
         catch
         {
-            await _transactionManagementService
-                .UpdateTransactionStatusAsync(transaction, TransactionStatus.Failed);
+            await HandleError(transaction, ErrorCode.UnhandledError);
 
             return true;
         }
@@ -129,6 +130,32 @@ public class TransactionProcessingService : ITransactionProcessingService
             .UpdateTransactionStatusAsync(
                 transaction,
                 TransactionStatus.Proceed);
+    }
+
+    private async Task ProcessRevert(
+        Transaction transaction,
+        IClientSessionHandle sessionHandle)
+    {
+        var isStepSuccess = transaction.FromWallet != ConstantValues.NoWallet ?
+            await ProcessCreditAsync(transaction, sessionHandle) : true;
+        if (isStepSuccess && transaction.ToWallet != ConstantValues.NoWallet)
+            await ProcessDebitAsync(transaction, sessionHandle);
+
+        if (isStepSuccess)
+        {
+            await _transactionManagementService
+                .UpdateTransactionStatusAsync(
+                    transaction,
+                    TransactionStatus.Proceed);
+
+            var originalTransaction = await _transactionManagementService
+                .GetTransactionByTransactionIdAsync(transaction.ParentTransactionId);
+
+            await _transactionManagementService
+                .UpdateTransactionStatusAsync(
+                    originalTransaction,
+                    TransactionStatus.Reverted);
+        }
     }
 
     private async Task<bool> ProcessDebitAsync(

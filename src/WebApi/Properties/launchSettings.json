@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "WebUI": {
+    "WebApi": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
