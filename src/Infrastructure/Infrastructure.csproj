@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Defender.Mongo.MessageBroker" Version="8.1.1" />
+      <PackageReference Include="Defender.Mongo.MessageBroker" Version="8.1.2" />
       <PackageReference Include="Defender.Utils" Version="1.0.9" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
       <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.2.0" />
