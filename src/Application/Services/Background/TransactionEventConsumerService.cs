@@ -58,6 +58,10 @@ public class TransactionEventConsumerService(
                 _subscribeOption,
                 stoppingToken);
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
         finally
         {
             _isRunning = false;
