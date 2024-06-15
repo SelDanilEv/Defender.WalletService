@@ -2,12 +2,13 @@
 using Defender.Mongo.MessageBroker.Interfaces.Queue;
 using Defender.WalletService.Application.Common.Interfaces.Services;
 using Defender.WalletService.Application.Events;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Defender.WalletService.Application.Services.Background;
 
 public class TransactionEventConsumerService(
-    IQueueConsumer<NewTransactionCreatedEvent> consumer,
+    IServiceScopeFactory serviceScopeFactory,
     ITransactionProcessingService transactionProcessingService)
     : BackgroundService, IDisposable
 {
@@ -29,6 +30,10 @@ public class TransactionEventConsumerService(
         {
             try
             {
+                using var scope = serviceScopeFactory.CreateScope();
+
+                var consumer = scope.ServiceProvider.GetRequiredService<IQueueConsumer<NewTransactionCreatedEvent>>();
+
                 await consumer.SubscribeQueueAsync(
                     _subscribeOption,
                     stoppingToken);
@@ -54,6 +59,10 @@ public class TransactionEventConsumerService(
         _isRunning = true;
         try
         {
+            using var scope = serviceScopeFactory.CreateScope();
+
+            var consumer = scope.ServiceProvider.GetRequiredService<IQueueConsumer<NewTransactionCreatedEvent>>();
+
             await consumer.RetryMissedEventsAsync(
                 _subscribeOption,
                 stoppingToken);
@@ -68,14 +77,15 @@ public class TransactionEventConsumerService(
         }
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public override Task StopAsync(CancellationToken cancellationToken)
     {
         _timer?.Change(Timeout.Infinite, 0);
         return Task.CompletedTask;
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         _timer?.Dispose();
+        base.Dispose();
     }
 }
