@@ -2,7 +2,6 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Defender.WalletService.Application.Common.Interfaces.Services;
-using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Application.Services.Background;
 using Defender.WalletService.Application.Services;
 

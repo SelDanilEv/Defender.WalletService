@@ -1,8 +1,8 @@
 ﻿using Defender.Common.Errors;
 using Defender.Common.Exceptions;
 using Defender.Common.Interfaces;
-using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
+using Defender.WalletService.Application.Common.Interfaces.Services;
 using Defender.WalletService.Domain.Entities.Wallets;
 using Defender.WalletService.Domain.Enums;
 

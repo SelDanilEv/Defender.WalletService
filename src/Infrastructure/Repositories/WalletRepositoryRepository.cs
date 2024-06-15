@@ -9,10 +9,10 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
-namespace Defender.WalletService.Infrastructure.Repositories.DomainModels;
+namespace Defender.WalletService.Infrastructure.Repositories;
 
 public class WalletRepository(
-        IOptions<MongoDbOptions> mongoOption) 
+        IOptions<MongoDbOptions> mongoOption)
     : BaseMongoRepository<Wallet>(mongoOption.Value), IWalletRepository
 {
     public async Task<Wallet> GetWalletByUserIdAsync(Guid userId)

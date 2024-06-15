@@ -7,7 +7,7 @@ using Defender.Common.Errors;
 using Defender.Common.Exceptions;
 using Defender.Common.Extension;
 using Defender.Common.Helpers;
-using Defender.WalletService.Application.Configuration.Extensions;
+using Defender.WalletService.Application.Configuration.Exstension;
 using FluentValidation.AspNetCore;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,7 +20,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ProblemDetailsOptions = Hellang.Middleware.ProblemDetails.ProblemDetailsOptions;
 
-namespace Defender.WalletService.WebApi;
+namespace WebApi;
 
 public static class ConfigureServices
 {

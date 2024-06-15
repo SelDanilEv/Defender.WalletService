@@ -1,7 +1,7 @@
 ﻿using Defender.WalletService.Domain.Entities.Wallets;
 using Defender.WalletService.Domain.Enums;
 
-namespace Defender.WalletService.Application.Common.Interfaces;
+namespace Defender.WalletService.Application.Common.Interfaces.Services;
 
 public interface IWalletManagementService
 {

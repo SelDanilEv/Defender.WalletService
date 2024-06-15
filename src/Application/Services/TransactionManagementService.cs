@@ -6,8 +6,8 @@ using Defender.Common.Errors;
 using Defender.Common.Exceptions;
 using Defender.Mongo.MessageBroker.Interfaces.Queue;
 using Defender.Mongo.MessageBroker.Interfaces.Topic;
-using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
+using Defender.WalletService.Application.Common.Interfaces.Services;
 using Defender.WalletService.Application.Events;
 using Defender.WalletService.Domain.Entities.Transactions;
 

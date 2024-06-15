@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using Defender.Common.Modules.Home.Queries;
 using Defender.Common.DTOs;
 
-namespace Defender.WalletService.WebApi.Controllers.V1;
+namespace WebApi.Controllers.V1;
 
 public partial class HomeController(
         IMediator mediator,

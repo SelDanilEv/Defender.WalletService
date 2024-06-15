@@ -5,12 +5,13 @@ using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Defender.Common.Attributes;
 using Defender.WalletService.Application.DTOs;
-using Defender.NotificationService.Application.Modules.Monitoring.Queries;
 using Defender.Common.DB.Pagination;
 using Defender.WalletService.Application.Modules.Transactions.Commands;
 using Defender.Common.Consts;
+using Defender.WalletService.Application.Modules.Transactions.Queries;
+using WebApi.Controllers;
 
-namespace Defender.WalletService.WebApi.Controllers.V1;
+namespace WebApi.Controllers.V1;
 
 public class TransactionController(IMediator mediator, IMapper mapper)
     : BaseApiController(mediator, mapper)

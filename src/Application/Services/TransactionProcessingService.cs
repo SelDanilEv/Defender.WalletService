@@ -1,6 +1,5 @@
 ﻿using Defender.Common.Errors;
 using Defender.Common.Helpers;
-using Defender.WalletService.Application.Common.Interfaces;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Domain.Entities.Transactions;
 using Defender.WalletService.Domain.Consts;

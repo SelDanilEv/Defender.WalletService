@@ -7,85 +7,78 @@ using Microsoft.Extensions.Hosting;
 
 namespace Defender.WalletService.Application.Services.Background;
 
-public class TransactionEventConsumerService(
-    IServiceScopeFactory serviceScopeFactory,
-    ITransactionProcessingService transactionProcessingService)
-    : BackgroundService, IDisposable
+public class TransactionEventConsumerService(IServiceScopeFactory scopeFactory) : BackgroundService
 {
-    private readonly SubscribeOptions<NewTransactionCreatedEvent> _subscribeOption =
-        SubscribeOptionsBuilder<NewTransactionCreatedEvent>.Create()
-            .SetAction(transactionProcessingService.ProcessTransaction)
-            .Build();
-
-    private const int RunEachMinute = 1;
-    private Timer? _timer;
-    private bool _isRunning = false;
-
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _timer = new Timer(async _ => await Retry(null, stoppingToken),
-            null, TimeSpan.FromMinutes(RunEachMinute), TimeSpan.FromMinutes(RunEachMinute));
+        var listeningTask = ListenForNewTransactions(stoppingToken);
+        var retryingTask = RetryFailedTransactions(stoppingToken);
 
+        await Task.WhenAll(listeningTask, retryingTask);
+    }
+
+    private async Task ListenForNewTransactions(CancellationToken stoppingToken)
+    {
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                using var scope = serviceScopeFactory.CreateScope();
+                using var scope = scopeFactory.CreateScope();
+                var consumer = CreateQueueConsumer(scope);
+                var subscribeOption = CreateSubscribeOptions(scope);
 
-                var consumer = scope.ServiceProvider.GetRequiredService<IQueueConsumer<NewTransactionCreatedEvent>>();
-
-                await consumer.SubscribeQueueAsync(
-                    _subscribeOption,
-                    stoppingToken);
+                await consumer.SubscribeQueueAsync(subscribeOption, stoppingToken);
+            }
+            catch (OperationCanceledException)
+            {
+                break; // Expected during shutdown
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Error subscribing to queue: {ex.Message}");
+                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+            }
+        }
+    }
+
+    private async Task RetryFailedTransactions(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                using var scope = scopeFactory.CreateScope();
+                var consumer = CreateQueueConsumer(scope);
+                var subscribeOption = CreateSubscribeOptions(scope);
+
+                await consumer.RetryMissedEventsAsync(subscribeOption, stoppingToken);
+            }
+            catch (OperationCanceledException)
+            {
+                break; // Expected during shutdown
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during transaction retry: {ex.Message}");
             }
             finally
             {
-                await Task.Delay(10000, stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
         }
     }
 
-    private async Task Retry(object? state, CancellationToken stoppingToken)
+    private static IQueueConsumer<NewTransactionCreatedEvent> CreateQueueConsumer(IServiceScope scope)
     {
-        if (_isRunning)
-        {
-            return;
-        }
-
-        _isRunning = true;
-        try
-        {
-            using var scope = serviceScopeFactory.CreateScope();
-
-            var consumer = scope.ServiceProvider.GetRequiredService<IQueueConsumer<NewTransactionCreatedEvent>>();
-
-            await consumer.RetryMissedEventsAsync(
-                _subscribeOption,
-                stoppingToken);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-        finally
-        {
-            _isRunning = false;
-        }
+        return scope.ServiceProvider.GetRequiredService<IQueueConsumer<NewTransactionCreatedEvent>>();
     }
 
-    public override Task StopAsync(CancellationToken cancellationToken)
+    private static SubscribeOptions<NewTransactionCreatedEvent> CreateSubscribeOptions(IServiceScope scope)
     {
-        _timer?.Change(Timeout.Infinite, 0);
-        return Task.CompletedTask;
-    }
+        var transactionProcessingService = scope.ServiceProvider.GetRequiredService<ITransactionProcessingService>();
 
-    public override void Dispose()
-    {
-        _timer?.Dispose();
-        base.Dispose();
+        return SubscribeOptionsBuilder<NewTransactionCreatedEvent>.Create()
+                .SetAction(transactionProcessingService.ProcessTransaction)
+                .Build();
     }
 }

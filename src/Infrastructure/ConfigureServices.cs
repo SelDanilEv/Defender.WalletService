@@ -12,7 +12,6 @@ using Defender.WalletService.Application.Events;
 using Defender.WalletService.Application.Services;
 using Defender.WalletService.Application.Services.Background;
 using Defender.WalletService.Infrastructure.Repositories;
-using Defender.WalletService.Infrastructure.Repositories.DomainModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;

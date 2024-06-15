@@ -8,8 +8,9 @@ using Defender.Common.Consts;
 using Defender.WalletService.Application.DTOs;
 using Defender.WalletService.Application.Modules.Wallets.Commands;
 using Defender.WalletService.Application.Modules.Wallets.Queries;
+using WebApi.Controllers;
 
-namespace Defender.WalletService.WebApi.Controllers.V1;
+namespace WebApi.Controllers.V1;
 
 public class WalletController(IMediator mediator, IMapper mapper) : BaseApiController(mediator, mapper)
 {

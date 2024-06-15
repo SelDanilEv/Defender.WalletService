@@ -3,7 +3,7 @@ using Defender.WalletService.Application.DTOs;
 using Defender.WalletService.Domain.Entities.Transactions;
 using Defender.WalletService.Domain.Entities.Wallets;
 
-namespace Defender.WalletService.Application.Common.Mappings;
+namespace Defender.WalletService.Application.Mappings;
 
 public class MappingProfile : BaseMappingProfile
 {

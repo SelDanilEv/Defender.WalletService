@@ -3,7 +3,7 @@ using Defender.Common.DB.SharedStorage.Enums;
 using Defender.Common.Errors;
 using Defender.WalletService.Domain.Entities.Transactions;
 
-namespace Defender.WalletService.Application.Common.Interfaces;
+namespace Defender.WalletService.Application.Common.Interfaces.Services;
 
 public interface ITransactionManagementService
 {
@@ -28,7 +28,7 @@ public interface ITransactionManagementService
         Transaction.CreateTransactionRequest request);
 
     Task<Transaction> CreateTransferTransactionAsync(
-        int fromWallet, 
+        int fromWallet,
         Transaction.CreateTransactionRequest request);
 
     Task<Transaction> CreatePaymentTransactionAsync(
