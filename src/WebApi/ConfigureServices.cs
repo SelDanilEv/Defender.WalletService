@@ -74,7 +74,7 @@ public static class ConfigureServices
                 ValidIssuer = configuration["JwtTokenIssuer"],
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(SecretsHelper.GetSecretAsync(Secret.JwtSecret).Result))
+                    Encoding.UTF8.GetBytes(SecretsHelper.GetSecretSync(Secret.JwtSecret, true)))
             };
         });
 
