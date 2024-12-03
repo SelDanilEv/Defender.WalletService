@@ -1,4 +1,4 @@
-﻿using Defender.Mongo.MessageBroker.Configuration;
+﻿using Defender.Mongo.MessageBroker.Configuration.Subscribe;
 using Defender.Mongo.MessageBroker.Interfaces.Queue;
 using Defender.WalletService.Application.Common.Interfaces.Services;
 using Defender.WalletService.Application.Events;

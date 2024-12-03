@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Defender.WalletService.Application.Configuration.Exstension;
+namespace Defender.WalletService.Application.Configuration.Extension;
 
 public static class ServiceOptionsExtensions
 {

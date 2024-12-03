@@ -1,13 +1,13 @@
-﻿using Defender.Common.Errors;
+﻿using Defender.Common.DB.SharedStorage.Enums;
+using Defender.Common.Errors;
 using Defender.Common.Helpers;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
-using Defender.WalletService.Domain.Entities.Transactions;
-using Defender.WalletService.Domain.Consts;
-using MongoDB.Driver;
-using Defender.Common.DB.SharedStorage.Enums;
 using Defender.WalletService.Application.Common.Interfaces.Services;
 using Defender.WalletService.Application.Events;
 using Defender.WalletService.Application.Mappings;
+using Defender.WalletService.Domain.Consts;
+using Defender.WalletService.Domain.Entities.Transactions;
+using MongoDB.Driver;
 
 namespace Defender.WalletService.Application.Services;
 
@@ -135,8 +135,7 @@ public class TransactionProcessingService : ITransactionProcessingService
         Transaction transaction,
         IClientSessionHandle sessionHandle)
     {
-        var isStepSuccess = transaction.FromWallet != ConstantValues.NoWallet ?
-            await ProcessCreditAsync(transaction, sessionHandle) : true;
+        var isStepSuccess = transaction.FromWallet == ConstantValues.NoWallet || await ProcessCreditAsync(transaction, sessionHandle);
         if (isStepSuccess && transaction.ToWallet != ConstantValues.NoWallet)
             await ProcessDebitAsync(transaction, sessionHandle);
 

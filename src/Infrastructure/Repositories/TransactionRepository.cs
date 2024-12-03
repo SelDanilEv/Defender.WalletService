@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 
 namespace Defender.WalletService.Infrastructure.Repositories;
 
-public class TransactionRepository(IOptions<MongoDbOptions> mongoOption) 
+public class TransactionRepository(IOptions<MongoDbOptions> mongoOption)
     : BaseMongoRepository<Transaction>(mongoOption.Value), ITransactionRepository
 {
     public async Task<PagedResult<Transaction>> GetTransactionsAsync(

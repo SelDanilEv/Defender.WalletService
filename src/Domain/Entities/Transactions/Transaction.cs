@@ -1,14 +1,16 @@
-﻿using Defender.Common.Entities;
+﻿using Defender.Common.DB.SharedStorage.Enums;
+using Defender.Common.Entities;
 using Defender.WalletService.Domain.Consts;
 using Defender.WalletService.Domain.Enums;
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
-using Defender.Common.DB.SharedStorage.Enums;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Defender.WalletService.Domain.Entities.Transactions;
 
 public class Transaction : IBaseModel
 {
+    [BsonId]
+    [BsonRepresentation(BsonType.String)]
     public Guid Id { get; set; }
 
     public string? TransactionId { get; set; }

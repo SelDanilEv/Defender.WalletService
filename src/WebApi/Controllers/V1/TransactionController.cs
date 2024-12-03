@@ -1,15 +1,14 @@
-﻿using AutoMapper;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using AutoMapper;
 using Defender.Common.Attributes;
-using Defender.WalletService.Application.DTOs;
-using Defender.Common.DB.Pagination;
-using Defender.WalletService.Application.Modules.Transactions.Commands;
 using Defender.Common.Consts;
+using Defender.Common.DB.Pagination;
+using Defender.WalletService.Application.DTOs;
+using Defender.WalletService.Application.Modules.Transactions.Commands;
 using Defender.WalletService.Application.Modules.Transactions.Queries;
-using WebApi.Controllers;
+using MediatR;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.V1;
 

@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
+using Defender.WalletService.Application.Common.Interfaces.Services;
+using Defender.WalletService.Application.Services;
+using Defender.WalletService.Application.Services.Background;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using Defender.WalletService.Application.Common.Interfaces.Services;
-using Defender.WalletService.Application.Services.Background;
-using Defender.WalletService.Application.Services;
 
 namespace Defender.WalletService.Application;
 

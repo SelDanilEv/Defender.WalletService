@@ -1,6 +1,6 @@
 ﻿using Defender.WalletService.Domain.Enums;
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Defender.WalletService.Domain.Entities.Wallets;
 

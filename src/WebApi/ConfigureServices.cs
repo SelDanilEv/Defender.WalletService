@@ -7,7 +7,7 @@ using Defender.Common.Errors;
 using Defender.Common.Exceptions;
 using Defender.Common.Extension;
 using Defender.Common.Helpers;
-using Defender.WalletService.Application.Configuration.Exstension;
+using Defender.WalletService.Application.Configuration.Extension;
 using FluentValidation.AspNetCore;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

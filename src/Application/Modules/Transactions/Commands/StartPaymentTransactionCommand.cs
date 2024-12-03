@@ -1,12 +1,12 @@
 ﻿using Defender.Common.Errors;
 using Defender.Common.Exceptions;
+using Defender.Common.Extension;
 using Defender.Common.Interfaces;
+using Defender.WalletService.Application.Common.Interfaces.Services;
 using Defender.WalletService.Domain.Entities.Transactions;
 using Defender.WalletService.Domain.Entities.Wallets;
 using FluentValidation;
-using Defender.Common.Extension;
 using MediatR;
-using Defender.WalletService.Application.Common.Interfaces.Services;
 
 namespace Defender.WalletService.Application.Modules.Transactions.Commands;
 
