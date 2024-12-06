@@ -1,29 +1,38 @@
-﻿using Defender.Common.Errors;
+﻿using Defender.Common.Cache;
+using Defender.Common.Errors;
 using Defender.Common.Exceptions;
 using Defender.Common.Interfaces;
+using Defender.DistributedCache;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Application.Common.Interfaces.Services;
 using Defender.WalletService.Domain.Entities.Wallets;
 using Defender.WalletService.Domain.Enums;
+using MongoDB.Driver;
 
 namespace Defender.WalletService.Application.Services;
 
 public class WalletManagementService(
+        IDistributedCache distributedCache,
         IWalletRepository walletRepository,
         ICurrentAccountAccessor currentAccountAccessor)
     : IWalletManagementService
 {
-    public async Task<Wallet> GetWalletByUserIdAsync(Guid userId)
+    public Task<IClientSessionHandle> OpenWalletUpdateSessionAsync()
     {
-        return await walletRepository.GetWalletByUserIdAsync(userId);
+        return walletRepository.OpenSessionAsync();
     }
 
-    public async Task<Wallet> GetWalletByNumberAsync(int walletNumber)
+    public Task<Wallet> GetWalletByUserIdAsync(Guid userId)
     {
-        return await walletRepository.GetWalletByNumberAsync(walletNumber);
+        return walletRepository.GetWalletByUserIdAsync(userId);
     }
 
-    public async Task<Wallet> CreateNewWalletAsync(Guid? userId = null)
+    public Task<Wallet> GetWalletByNumberAsync(int walletNumber)
+    {
+        return walletRepository.GetWalletByNumberAsync(walletNumber);
+    }
+
+    public Task<Wallet> CreateNewWalletAsync(Guid? userId = null)
     {
         var wallet = new Wallet
         {
@@ -39,7 +48,7 @@ public class WalletManagementService(
             ]
         };
 
-        return await walletRepository.CreateNewWalletAsync(wallet);
+        return walletRepository.CreateNewWalletAsync(wallet);
     }
 
     public async Task<Wallet> AddCurrencyAccountAsync(
@@ -65,7 +74,7 @@ public class WalletManagementService(
 
         wallet.CurrencyAccounts.Add(new CurrencyAccount(currency, isDefault));
 
-        return await walletRepository.UpdateCurrencyAccountsAsync(
+        return await this.UpdateCurrencyAccountsAsync(
             wallet.Id,
             wallet.CurrencyAccounts);
     }
@@ -91,9 +100,25 @@ public class WalletManagementService(
         if (oldDefaultAccount != null)
             oldDefaultAccount.IsDefault = false;
 
-        return await walletRepository.UpdateCurrencyAccountsAsync(
+        return await this.UpdateCurrencyAccountsAsync(
             wallet.Id,
             wallet.CurrencyAccounts);
+    }
+
+    public async Task<Wallet> UpdateCurrencyAccountsAsync(Guid walletId,
+        HashSet<CurrencyAccount> currencyAccounts,
+        IClientSessionHandle? clientSessionHandle = null)
+    {
+        var cacheId = CacheConventionBuilder.BuildDistributedCacheKey(
+            CacheForService.Portal, CacheModel.Wallet,
+            walletId.ToString());
+
+        _ = distributedCache.Invalidate(cacheId);
+
+        return await walletRepository.UpdateCurrencyAccountsAsync(
+            walletId,
+            currencyAccounts,
+            clientSessionHandle);
     }
 
 }

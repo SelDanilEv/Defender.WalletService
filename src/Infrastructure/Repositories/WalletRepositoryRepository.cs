@@ -56,7 +56,7 @@ public class WalletRepository(
         return await UpdateItemAsync(request, clientSessionHandle);
     }
 
-    public async Task<IClientSessionHandle> StartSessionAsync()
+    public async Task<IClientSessionHandle> OpenSessionAsync()
     {
         var sessionOptions = new ClientSessionOptions
         {

@@ -16,5 +16,5 @@ public interface IWalletRepository
         HashSet<CurrencyAccount> currencyAccounts,
         IClientSessionHandle? clientSessionHandle = null);
 
-    Task<IClientSessionHandle> StartSessionAsync();
+    Task<IClientSessionHandle> OpenSessionAsync();
 }
