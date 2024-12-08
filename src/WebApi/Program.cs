@@ -59,4 +59,4 @@ app.MapControllerRoute(
     name: "default",
     pattern: "api/{controller}/{action=Index}");
 
-app.Run();
+await app.RunAsync();
