@@ -19,11 +19,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Defender.Mongo.MessageBroker" Version="8.1.5" />
       <PackageReference Include="MongoDB.Driver" Version="3.0.0" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
     </ItemGroup>
-
 
      <!--<ItemGroup>
         <ProjectReference Include="..\..\..\Defender.Mongo.MessageBroker\src\Defender.Mongo.MessageBroker\Defender.Mongo.MessageBroker.csproj" />

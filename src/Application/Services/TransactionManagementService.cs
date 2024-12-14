@@ -4,20 +4,20 @@ using Defender.Common.DB.SharedStorage.Entities;
 using Defender.Common.DB.SharedStorage.Enums;
 using Defender.Common.Errors;
 using Defender.Common.Exceptions;
-using Defender.Mongo.MessageBroker.Interfaces.Queue;
-using Defender.Mongo.MessageBroker.Interfaces.Topic;
+using Defender.Common.Kafka;
+using Defender.Common.Kafka.Default;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Application.Common.Interfaces.Services;
-using Defender.WalletService.Application.Events;
+using Defender.WalletService.Common.Kafka;
 using Defender.WalletService.Domain.Entities.Transactions;
 
 namespace Defender.WalletService.Application.Services;
 
 public class TransactionManagementService(
-        ITransactionRepository transactionRepository,
-        IQueueProducer<NewTransactionCreatedEvent> newTransactionsProducer,
-        ITopicProducer<TransactionStatusUpdatedEvent> updatedStatusesProducer
-    )
+    ITransactionRepository transactionRepository,
+    IDefaultKafkaProducer<string> newTransactionsProducer,
+    IDefaultKafkaProducer<TransactionStatusUpdatedEvent> updatedStatusesProducer
+)
     : ITransactionManagementService
 {
     public async Task<PagedResult<Transaction>> GetTransactionsByWalletNumberAsync(
@@ -46,6 +46,7 @@ public class TransactionManagementService(
         {
             throw new ServiceException(ErrorCode.BR_WLT_InvalidTransactionStatus);
         }
+
         if (newStatus == transaction.TransactionStatus && string.IsNullOrWhiteSpace(failureCode))
         {
             return transaction;
@@ -67,7 +68,10 @@ public class TransactionManagementService(
             TransactionPurpose = result.TransactionPurpose,
         };
 
-        await updatedStatusesProducer.PublishTopicAsync(statusUpdatedEvent);
+        await updatedStatusesProducer.ProduceAsync(
+            Topic.TransactionStatusUpdates.GetName(),
+            statusUpdatedEvent,
+            CancellationToken.None);
 
         return result;
     }
@@ -113,25 +117,25 @@ public class TransactionManagementService(
     {
         var originalTransaction = await GetTransactionByTransactionIdAsync(transactionId);
 
-        if (originalTransaction.TransactionStatus == TransactionStatus.Queued)
+        switch (originalTransaction.TransactionStatus)
         {
-            await UpdateTransactionStatusAsync(originalTransaction, TransactionStatus.Canceled);
+            case TransactionStatus.Queued:
+                await UpdateTransactionStatusAsync(originalTransaction, TransactionStatus.Canceled);
 
-            return originalTransaction;
+                return originalTransaction;
+            case TransactionStatus.Proceed:
+                {
+                    var transaction = Transaction.CreateCancelation(originalTransaction);
+
+                    _ = UpdateTransactionStatusAsync(
+                        originalTransaction,
+                        TransactionStatus.QueuedForRevert);
+
+                    return await CreateTransactionAsync(transaction);
+                }
+            default:
+                throw new ServiceException(ErrorCode.BR_WLT_TransactionCanNotBeCanceled);
         }
-
-        if (originalTransaction.TransactionStatus == TransactionStatus.Proceed)
-        {
-            var transaction = Transaction.CreateCancelation(originalTransaction);
-
-            _ = UpdateTransactionStatusAsync(
-                originalTransaction,
-                TransactionStatus.QueuedForRevert);
-
-            return await CreateTransactionAsync(transaction);
-        }
-
-        throw new ServiceException(ErrorCode.BR_WLT_TransactionCanNotBeCanceled);
     }
 
     private async Task<Transaction> CreateTransactionAsync(Transaction transaction)
@@ -139,14 +143,11 @@ public class TransactionManagementService(
         transaction = await transactionRepository
             .CreateNewTransactionAsync(transaction);
 
-        var transactionEvent = new NewTransactionCreatedEvent
-        {
-            TransactionId = transaction.TransactionId,
-        };
-
-        await newTransactionsProducer.PublishQueueAsync(transactionEvent);
+        await newTransactionsProducer.ProduceAsync(
+            KafkaTopic.TransactionsToProcess.GetName(),
+            transaction.TransactionId,
+            CancellationToken.None);
 
         return transaction;
     }
-
 }

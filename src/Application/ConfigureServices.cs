@@ -1,11 +1,14 @@
 ﻿using System.Reflection;
+using Defender.Common.Configuration.Options.Kafka;
 using Defender.Common.Enums;
 using Defender.Common.Helpers;
+using Defender.Common.Kafka.Extension;
 using Defender.DistributedCache.Configuration.Options;
 using Defender.DistributedCache.Postgres.Extensions;
 using Defender.WalletService.Application.Common.Interfaces.Services;
 using Defender.WalletService.Application.Services;
 using Defender.WalletService.Application.Services.Background;
+using Defender.WalletService.Application.Services.Background.Kafka;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,8 +24,32 @@ public static class ConfigureServices
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
-        services.AddCache(configuration);
-        services.RegisterServices();
+        services.RegisterKafkaServices(configuration)
+            .RegisterBackgroundServices()
+            .AddCache(configuration)
+            .RegisterServices();
+
+        return services;
+    }
+    
+    private static IServiceCollection RegisterKafkaServices(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddKafka(options =>
+        {
+            configuration.GetSection(nameof(KafkaOptions)).Bind(options);
+        });
+
+        return services;
+    }
+
+    private static IServiceCollection RegisterBackgroundServices(
+        this IServiceCollection services)
+    {
+        services.AddHostedService<CreateKafkaTopicsService>();
+
+        services.AddHostedService<EventListenerService>();
 
         return services;
     }
@@ -45,8 +72,6 @@ public static class ConfigureServices
         services.AddTransient<IWalletManagementService, WalletManagementService>();
         services.AddTransient<ITransactionManagementService, TransactionManagementService>();
         services.AddTransient<ITransactionProcessingService, TransactionProcessingService>();
-
-        services.AddHostedService<TransactionEventConsumerService>();
 
         return services;
     }

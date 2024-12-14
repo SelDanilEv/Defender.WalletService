@@ -1,9 +1,7 @@
-﻿using Defender.WalletService.Application.Events;
-
-namespace Defender.WalletService.Application.Common.Interfaces.Services;
+﻿namespace Defender.WalletService.Application.Common.Interfaces.Services;
 
 public interface ITransactionProcessingService
 {
     Task<bool> ProcessTransaction(
-        NewTransactionCreatedEvent transaction);
+        string transactionId);
 }

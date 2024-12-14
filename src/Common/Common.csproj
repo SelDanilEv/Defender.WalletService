@@ -2,16 +2,15 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <RootNamespace>Defender.WalletService.Domain</RootNamespace>
-        <AssemblyName>Defender.WalletService.Domain</AssemblyName>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MediatR" Version="12.4.1" />
         <PackageReference Include="Defender.Common" Version="1.5.0" />
     </ItemGroup>
     
-
+<!--    <ItemGroup>-->
+<!--        <ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" />-->
+<!--    </ItemGroup>-->
 </Project>

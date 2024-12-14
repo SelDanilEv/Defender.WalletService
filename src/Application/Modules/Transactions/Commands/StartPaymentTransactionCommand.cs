@@ -36,9 +36,8 @@ public sealed class StartPaymentTransactionCommandHandler(
         IAuthorizationCheckingService authorizationCheckingService,
         ICurrentAccountAccessor currentAccountAccessor,
         ITransactionManagementService transactionManagementService,
-        IWalletManagementService walletManagementService
-        ) :
-    IRequestHandler<StartPaymentTransactionCommand, Transaction>
+        IWalletManagementService walletManagementService) 
+    : IRequestHandler<StartPaymentTransactionCommand, Transaction>
 {
 
     public async Task<Transaction> Handle(

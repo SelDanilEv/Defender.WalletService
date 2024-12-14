@@ -1,12 +1,6 @@
 ﻿using System.Reflection;
 using Defender.Common.Configuration.Options;
-using Defender.Common.DB.SharedStorage.Entities;
-using Defender.Common.Extension;
-using Defender.Mongo.MessageBroker.Extensions;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
-using Defender.WalletService.Application.Configuration.Options;
-using Defender.WalletService.Application.Configuration.Options.Shared;
-using Defender.WalletService.Application.Events;
 using Defender.WalletService.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -49,20 +43,20 @@ public static class ConfigureServices
         IHostEnvironment environment,
         MongoDbOptions baseDbOptions)
     {
-        services.AddQueueConsumer<NewTransactionCreatedEvent>(opt =>
-        {
-            opt.ApplyOptions(new NewTransactionQueueOptions(baseDbOptions));
-        });
-
-        services.AddQueueProducer<NewTransactionCreatedEvent>(opt =>
-        {
-            opt.ApplyOptions(new NewTransactionQueueOptions(baseDbOptions));
-        });
-
-        services.AddTopicProducer<TransactionStatusUpdatedEvent>(opt =>
-        {
-            opt.ApplyOptions(new TransactionStatusesTopicProducerOptions(environment.GetAppEnvironment()));
-        });
+        // services.AddQueueConsumer<NewTransactionCreatedEvent>(opt =>
+        // {
+        //     opt.ApplyOptions(new NewTransactionQueueOptions(baseDbOptions));
+        // });
+        //
+        // services.AddQueueProducer<NewTransactionCreatedEvent>(opt =>
+        // {
+        //     opt.ApplyOptions(new NewTransactionQueueOptions(baseDbOptions));
+        // });
+        //
+        // services.AddTopicProducer<TransactionStatusUpdatedEvent>(opt =>
+        // {
+        //     opt.ApplyOptions(new TransactionStatusesTopicProducerOptions(environment.GetAppEnvironment()));
+        // });
 
         return services;
     }

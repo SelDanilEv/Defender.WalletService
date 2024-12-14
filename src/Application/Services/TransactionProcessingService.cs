@@ -1,9 +1,7 @@
 ﻿using Defender.Common.DB.SharedStorage.Enums;
 using Defender.Common.Errors;
 using Defender.Common.Helpers;
-using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Application.Common.Interfaces.Services;
-using Defender.WalletService.Application.Events;
 using Defender.WalletService.Application.Mappings;
 using Defender.WalletService.Domain.Consts;
 using Defender.WalletService.Domain.Entities.Transactions;
@@ -17,7 +15,7 @@ public class TransactionProcessingService : ITransactionProcessingService
     private readonly ITransactionManagementService _transactionManagementService;
     private readonly IWalletManagementService _walletManagementService;
 
-    private readonly TransactionTypeActionMapper _transactionTypeMap = [];
+    private readonly TransactionTypeActionMapper _transactionTypeMap;
 
     public TransactionProcessingService(
         ITransactionManagementService transactionManagementService,
@@ -35,16 +33,15 @@ public class TransactionProcessingService : ITransactionProcessingService
             };
     }
 
-    public async Task<bool> ProcessTransaction(NewTransactionCreatedEvent transactionEvent)
+    public async Task<bool> ProcessTransaction(string transactionId)
     {
-        if (transactionEvent == null
-            || string.IsNullOrWhiteSpace(transactionEvent.TransactionId))
+        if (string.IsNullOrWhiteSpace(transactionId))
             return true;
 
         var transaction = await _transactionManagementService
-            .GetTransactionByTransactionIdAsync(transactionEvent.TransactionId);
+            .GetTransactionByTransactionIdAsync(transactionId);
 
-        if (transaction == null || transaction.TransactionStatus != TransactionStatus.Queued)
+        if (transaction.TransactionStatus != TransactionStatus.Queued)
             return true;
 
         try
@@ -68,7 +65,7 @@ public class TransactionProcessingService : ITransactionProcessingService
 
             if (isSucceeded) return true;
 
-            if (er != null && er.Code == WriteConflictErrorCode) return false;
+            if (er is { Code: WriteConflictErrorCode }) return false;
 
             transaction = await HandleError(transaction, ErrorCode.UnhandledError);
         }
