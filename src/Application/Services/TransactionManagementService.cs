@@ -1,14 +1,14 @@
-﻿using Defender.Common.DB.Model;
+﻿using Defender.WalletService.Common.Kafka;
+using Defender.Common.DB.Model;
 using Defender.Common.DB.Pagination;
 using Defender.Common.DB.SharedStorage.Entities;
 using Defender.Common.DB.SharedStorage.Enums;
 using Defender.Common.Errors;
 using Defender.Common.Exceptions;
-using Defender.Common.Kafka;
-using Defender.Common.Kafka.Default;
+using Defender.Kafka;
+using Defender.Kafka.Default;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Application.Common.Interfaces.Services;
-using Defender.WalletService.Common.Kafka;
 using Defender.WalletService.Domain.Entities.Transactions;
 
 namespace Defender.WalletService.Application.Services;

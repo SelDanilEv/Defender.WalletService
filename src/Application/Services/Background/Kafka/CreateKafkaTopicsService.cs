@@ -1,7 +1,7 @@
-﻿using Defender.Common.Configuration.Options.Kafka;
-using Defender.Common.Kafka.BackgroundServices;
-using Defender.Common.Kafka.Service;
-using Defender.WalletService.Common.Kafka;
+﻿using Defender.WalletService.Common.Kafka;
+using Defender.Kafka.BackgroundServices;
+using Defender.Kafka.Configuration.Options;
+using Defender.Kafka.Service;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

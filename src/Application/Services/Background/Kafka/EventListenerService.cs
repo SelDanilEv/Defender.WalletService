@@ -1,6 +1,6 @@
-﻿using Defender.Common.Kafka.Default;
+﻿using Defender.WalletService.Common.Kafka;
+using Defender.Kafka.Default;
 using Defender.WalletService.Application.Common.Interfaces.Services;
-using Defender.WalletService.Common.Kafka;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

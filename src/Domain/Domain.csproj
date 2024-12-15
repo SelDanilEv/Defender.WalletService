@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="MediatR" Version="12.4.1" />
-        <PackageReference Include="Defender.Common" Version="1.5.0" />
+        <PackageReference Include="Defender.Common" Version="1.6.0" />
     </ItemGroup>
     
 

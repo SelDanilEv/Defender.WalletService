@@ -7,7 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Defender.Common" Version="1.5.0" />
+        <PackageReference Include="Defender.Common" Version="1.6.0" />
+        <PackageReference Include="Defender.Kafka" Version="8.0.0" />
+        <PackageReference Include="Defender.DistributedCache" Version="0.1.4" />
     </ItemGroup>
     
 <!--    <ItemGroup>-->

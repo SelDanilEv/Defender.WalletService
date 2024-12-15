@@ -1,6 +1,4 @@
-﻿using Defender.Common.Enums;
-
-namespace Defender.WalletService.Common.Kafka;
+﻿namespace Defender.WalletService.Common.Kafka;
 
 public enum KafkaTopic
 {

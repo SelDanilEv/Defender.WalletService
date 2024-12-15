@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
-using Defender.Common.Configuration.Options.Kafka;
 using Defender.Common.Enums;
-using Defender.Common.Helpers;
-using Defender.Common.Kafka.Extension;
+using Defender.Kafka.Extension;
 using Defender.DistributedCache.Configuration.Options;
 using Defender.DistributedCache.Postgres.Extensions;
 using Defender.WalletService.Application.Common.Interfaces.Services;
@@ -12,6 +10,8 @@ using Defender.WalletService.Application.Services.Background.Kafka;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Defender.Kafka.Configuration.Options;
+using Defender.Common.Helpers;
 
 namespace Defender.WalletService.Application;
 
