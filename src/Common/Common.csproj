@@ -5,6 +5,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>Defender.WalletService.Common</RootNamespace>
+        <AssemblyName>Defender.WalletService.Common</AssemblyName>
+
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,8 +14,8 @@
         <PackageReference Include="Defender.Kafka" Version="8.0.0" />
         <PackageReference Include="Defender.DistributedCache" Version="0.1.4" />
     </ItemGroup>
-    
-<!--    <ItemGroup>-->
-<!--        <ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" />-->
-<!--    </ItemGroup>-->
+
+    <!--    <ItemGroup>-->
+    <!--        <ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" />-->
+    <!--    </ItemGroup>-->
 </Project>
