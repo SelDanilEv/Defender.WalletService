@@ -1,4 +1,5 @@
-﻿using Defender.Kafka.BackgroundServices;
+﻿using Defender.Kafka;
+using Defender.Kafka.BackgroundServices;
 using Defender.Kafka.Configuration.Options;
 using Defender.Kafka.Service;
 using Defender.WalletService.Common.Kafka;
@@ -17,6 +18,7 @@ public class CreateKafkaTopicsService(
         [
             kafkaTopicNameResolver.ResolveTopicName(KafkaTopic.ScheduledTasks.GetName()),
             kafkaTopicNameResolver.ResolveTopicName(KafkaTopic.TransactionsToProcess.GetName()),
+            kafkaTopicNameResolver.ResolveTopicName(Topic.TransactionStatusUpdates.GetName()),
         ];
 
     protected override short ReplicationFactor => 1;
