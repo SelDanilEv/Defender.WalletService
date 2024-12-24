@@ -19,10 +19,12 @@ public class EventListenerService(
         await Task.WhenAll(
             kafkaStringEventConsumer.StartConsuming(
                 KafkaTopic.ScheduledTasks.GetName(),
+                ConsumerGroup.Primary.GetName(),
                 HandleStringEvent,
                 stoppingToken),
             transactionsToProceedConsumer.StartConsuming(
                 KafkaTopic.TransactionsToProcess.GetName(),
+                ConsumerGroup.Primary.GetName(),
                 transactionProcessingService.ProcessTransaction,
                 stoppingToken)
         );

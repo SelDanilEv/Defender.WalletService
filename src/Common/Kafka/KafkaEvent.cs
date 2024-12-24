@@ -3,7 +3,6 @@
 public enum KafkaEvent
 {
     Unknown,
-
 }
 
 public static class KafkaEventExtensions
