@@ -3,6 +3,7 @@
 public enum KafkaEvent
 {
     Unknown,
+    StartCacheCleanup,
 }
 
 public static class KafkaEventExtensions

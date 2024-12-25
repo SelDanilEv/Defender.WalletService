@@ -3,6 +3,7 @@
 public enum ConsumerGroup
 {
     Primary,
+    DistributedCacheMember,
 }
 
 public static class ConsumerGroupExtensions

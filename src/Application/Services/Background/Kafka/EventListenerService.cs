@@ -1,4 +1,6 @@
-﻿using Defender.Kafka.Default;
+﻿using Defender.DistributedCache;
+using Defender.Kafka;
+using Defender.Kafka.Default;
 using Defender.WalletService.Application.Common.Interfaces.Services;
 using Defender.WalletService.Common.Kafka;
 using Microsoft.Extensions.Hosting;
@@ -9,6 +11,7 @@ namespace Defender.WalletService.Application.Services.Background.Kafka;
 public class EventListenerService(
     IDefaultKafkaConsumer<string> kafkaStringEventConsumer,
     IDefaultKafkaConsumer<string> transactionsToProceedConsumer,
+    IPostgresCacheCleanupService cacheCleanupService,
     ITransactionProcessingService transactionProcessingService,
     ILogger<EventListenerService> logger) : BackgroundService
 {
@@ -18,8 +21,8 @@ public class EventListenerService(
 
         await Task.WhenAll(
             kafkaStringEventConsumer.StartConsuming(
-                KafkaTopic.ScheduledTasks.GetName(),
-                ConsumerGroup.Primary.GetName(),
+                Topic.DistributedCache.GetName(),
+                ConsumerGroup.DistributedCacheMember.GetName(),
                 HandleStringEvent,
                 stoppingToken),
             transactionsToProceedConsumer.StartConsuming(
@@ -30,18 +33,24 @@ public class EventListenerService(
         );
     }
 
-    private Task HandleStringEvent(string @event)
+    private async Task HandleStringEvent(string @event)
     {
-        switch (@event.ToEvent())
+        try
         {
-            // case KafkaEvent.:
-            //     _ = lotteryProcessingService.QueueLotteriesForProcessing();
-            //     break;
-            default:
-                logger.LogWarning("Unknown event: {0}", @event);
-                break;
-        }
+            logger.LogInformation("Incoming event: {Event}", @event);
 
-        return Task.CompletedTask;
+            switch (@event.ToEvent())
+            {
+                case KafkaEvent.StartCacheCleanup:
+                    await cacheCleanupService.CheckAndRunCleanupAsync();
+                    break;
+                default:
+                    logger.LogWarning("Unknown event: {0}", @event);
+                    break;
+            }
+        }
+        catch (Exception ex) {
+            logger.LogError(ex, "Error while handling event: {Event}", @event);
+        }
     }
 }
