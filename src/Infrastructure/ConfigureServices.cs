@@ -23,9 +23,7 @@ public static class ConfigureServices
 
         services
             .RegisterRepositories()
-            .RegisterApiClients()
-            .RegisterClientWrappers()
-            .RegisterMessageBroker(environment, mongoDbOptions);
+            .RegisterClientWrappers();
 
 
         return services;
@@ -38,45 +36,11 @@ public static class ConfigureServices
         return services;
     }
 
-    private static IServiceCollection RegisterMessageBroker(
-        this IServiceCollection services,
-        IHostEnvironment environment,
-        MongoDbOptions baseDbOptions)
-    {
-        // services.AddQueueConsumer<NewTransactionCreatedEvent>(opt =>
-        // {
-        //     opt.ApplyOptions(new NewTransactionQueueOptions(baseDbOptions));
-        // });
-        //
-        // services.AddQueueProducer<NewTransactionCreatedEvent>(opt =>
-        // {
-        //     opt.ApplyOptions(new NewTransactionQueueOptions(baseDbOptions));
-        // });
-        //
-        // services.AddTopicProducer<TransactionStatusUpdatedEvent>(opt =>
-        // {
-        //     opt.ApplyOptions(new TransactionStatusesTopicProducerOptions(environment.GetAppEnvironment()));
-        // });
-
-        return services;
-    }
 
     private static IServiceCollection RegisterRepositories(this IServiceCollection services)
     {
         services.AddSingleton<ITransactionRepository, TransactionRepository>();
         services.AddSingleton<IWalletRepository, WalletRepository>();
-
-        return services;
-    }
-
-    private static IServiceCollection RegisterApiClients(
-        this IServiceCollection services)
-    {
-        //services.RegisterIdentityClient(
-        //    (serviceProvider, client) =>
-        //    {
-        //        client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<ServiceOptions>>().Value.Url);
-        //    });
 
         return services;
     }

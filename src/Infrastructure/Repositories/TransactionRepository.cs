@@ -5,12 +5,28 @@ using Defender.Common.DB.Repositories;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Domain.Entities.Transactions;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace Defender.WalletService.Infrastructure.Repositories;
 
-public class TransactionRepository(IOptions<MongoDbOptions> mongoOption)
-    : BaseMongoRepository<Transaction>(mongoOption.Value), ITransactionRepository
+public class TransactionRepository
+    : BaseMongoRepository<Transaction>, ITransactionRepository
 {
+    public TransactionRepository(IOptions<MongoDbOptions> mongoOption) : base(mongoOption.Value)
+    {
+        _mongoCollection.Indexes.CreateMany([
+            new CreateIndexModel<Transaction>(
+                Builders<Transaction>.IndexKeys.Ascending(x => x.TransactionId),
+                new CreateIndexOptions { Unique = true, Name = "TransactionId_Index" }),
+            new CreateIndexModel<Transaction>(
+                Builders<Transaction>.IndexKeys
+                    .Ascending(x => x.FromWallet)
+                    .Ascending(x => x.ToWallet)
+                    .Descending(x => x.UtcTransactionDate),
+                new CreateIndexOptions { Name = "User_Transactions_Index" })
+        ]);
+    }
+    
     public async Task<PagedResult<Transaction>> GetTransactionsAsync(
         PaginationRequest paginationRequest,
         int walletNumber)
