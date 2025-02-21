@@ -12,7 +12,7 @@
     <ItemGroup>
         <PackageReference Include="Defender.Common" Version="1.6.3" />
         <PackageReference Include="Defender.Kafka" Version="8.0.5" />
-        <PackageReference Include="Defender.DistributedCache" Version="0.1.6" />
+        <PackageReference Include="Defender.DistributedCache" Version="0.1.7" />
     </ItemGroup>
 
     <!--    <ItemGroup>-->
